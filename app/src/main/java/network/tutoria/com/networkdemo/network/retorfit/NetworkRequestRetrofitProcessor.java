@@ -2,6 +2,8 @@ package network.tutoria.com.networkdemo.network.retorfit;
 
 import android.content.Context;
 
+import com.google.gson.reflect.TypeToken;
+
 import org.junit.Assert;
 
 import java.io.File;
@@ -19,9 +21,10 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.processors.PublishProcessor;
 import io.reactivex.schedulers.Schedulers;
+import network.tutoria.com.networkdemo.network.GsonUtil;
+import network.tutoria.com.networkdemo.network.RequestBuilder;
 import network.tutoria.com.networkdemo.network.api.NetworkRequestProcessor;
 import network.tutoria.com.networkdemo.network.api.NetworkResultHandler;
-import network.tutoria.com.networkdemo.network.RequestBuilder;
 import network.tutoria.com.networkdemo.network.okhttp.UploadPostBody;
 import okhttp3.Call;
 import okhttp3.MediaType;
@@ -73,9 +76,19 @@ public class NetworkRequestRetrofitProcessor implements NetworkRequestProcessor 
         requestService = retrofit.create(RetrofitRequestService.class);
     }
 
+    private <T> T parseStringToObject(String response) throws Exception {
+        return GsonUtil.getGson().fromJson(response, new TypeToken<T>() {
+        }.getType());
+    }
+
     public <T> NetworkRequestProcessor startGetRequest(RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler) {
-        Observable<T> responseBodyObservable = requestService.get(requestContents.getHeaders(), requestContents.getUrl(), requestContents.getRequestParams());
-        responseBodyObservable.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+        Observable<ResponseBody> responseBodyObservable = requestService.get(requestContents.getHeaders(), requestContents.getUrl(), requestContents.getRequestParams());
+        responseBodyObservable.map(new Function<ResponseBody, T>() {
+            @Override
+            public T apply(@NonNull ResponseBody responseBody) throws Exception {
+                return parseStringToObject(responseBody.string());
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<T>() {
                     @Override
                     public void accept(T t) throws Exception {
@@ -92,7 +105,12 @@ public class NetworkRequestRetrofitProcessor implements NetworkRequestProcessor 
 
     @Override
     public <T> NetworkRequestProcessor startPostRequest(RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler) {
-        Observable<T> request = requestService.post(requestContents.getHeaders(), requestContents.getUrl(), requestContents.getRequestParams());
+        Observable<T> request = requestService.post(requestContents.getHeaders(), requestContents.getUrl(), requestContents.getRequestParams()).map(new Function<ResponseBody, T>() {
+            @Override
+            public T apply(@NonNull ResponseBody responseBody) throws Exception {
+                return parseStringToObject(responseBody.string());
+            }
+        });
         request.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<T>() {
             @Override
             public void accept(T t) throws Exception {
@@ -127,7 +145,12 @@ public class NetworkRequestRetrofitProcessor implements NetworkRequestProcessor 
             multiPartBuilder.addFormDataPart(fileParamKey, file.getName(), fileUploadBody);
             uploadPostBodies.add(fileUploadBody);
         }
-        Observable<T> uploadRequest = requestService.uploadFile(requestContents.getHeaders(), requestContents.getUrl(), multiPartBuilder.build().parts());
+        Observable<T> uploadRequest = requestService.uploadFile(requestContents.getHeaders(), requestContents.getUrl(), multiPartBuilder.build().parts()).map(new Function<ResponseBody, T>() {
+            @Override
+            public T apply(@NonNull ResponseBody responseBody) throws Exception {
+                return parseStringToObject(responseBody.string());
+            }
+        });
         if (fileTotalLength == 0) {
             fileTotalLength = 1;
         }

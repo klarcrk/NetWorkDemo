@@ -27,11 +27,11 @@ import retrofit2.http.Url;
 public interface RetrofitRequestService {
 
     @GET()
-    <T> Observable<T> get(@HeaderMap Map<String, String> headers, @Url String url, @QueryMap Map<String, String> queryParams);
+    Observable<ResponseBody> get(@HeaderMap Map<String, String> headers, @Url String url, @QueryMap Map<String, String> queryParams);
 
     @FormUrlEncoded
     @POST
-    <T> Observable<T> post(@HeaderMap Map<String, String> headers, @Url String url, @FieldMap Map<String, String> queryParams);
+     Observable<ResponseBody> post(@HeaderMap Map<String, String> headers, @Url String url, @FieldMap Map<String, String> queryParams);
 
 
     @FormUrlEncoded
@@ -45,6 +45,6 @@ public interface RetrofitRequestService {
 
     @Multipart
     @POST
-    <T> Observable<T> uploadFile(@HeaderMap Map<String, String> headers, @Url String url, @Part List<MultipartBody.Part> parts);
+    <T> Observable<ResponseBody> uploadFile(@HeaderMap Map<String, String> headers, @Url String url, @Part List<MultipartBody.Part> parts);
 
 }
