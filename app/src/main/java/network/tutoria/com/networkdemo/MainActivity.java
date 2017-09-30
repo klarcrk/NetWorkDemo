@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.util.List;
 
 import network.tutoria.com.networkdemo.network.RequestBuilder;
 import network.tutoria.com.networkdemo.network.api.NetworkResultHandler;
@@ -29,9 +30,9 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                RequestBuilder.get("http://gank.io/api/data/Android/10/1").execute(new NetworkResultHandler<Object>() {
+                RequestBuilder.get("http://gank.io/api/data/休息视频/1/1").execute(new NetworkResultHandler<List<GanHuo>>() {
                     @Override
-                    public void onLoadSuccess(Object result) {
+                    public void onLoadSuccess(List<GanHuo> result) {
                         super.onLoadSuccess(result);
                         textView.setText(result.toString());
                     }
