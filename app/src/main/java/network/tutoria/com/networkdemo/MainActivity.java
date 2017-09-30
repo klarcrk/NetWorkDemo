@@ -29,9 +29,9 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                RequestBuilder.get("http://gank.io/api/data/Android/10/1").execute(new NetworkResultHandler<String>() {
+                RequestBuilder.get("http://gank.io/api/data/Android/10/1").execute(new NetworkResultHandler<Object>() {
                     @Override
-                    public void onLoadSuccess(String result) {
+                    public void onLoadSuccess(Object result) {
                         super.onLoadSuccess(result);
                         textView.setText(result.toString());
                     }
