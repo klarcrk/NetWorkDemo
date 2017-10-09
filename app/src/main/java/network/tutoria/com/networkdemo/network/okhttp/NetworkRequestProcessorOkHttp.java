@@ -9,6 +9,7 @@ import org.junit.Assert;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
@@ -107,7 +108,7 @@ public class NetworkRequestProcessorOkHttp implements NetworkRequestProcessor {
         return requestBuilder.build();
     }
 
-    public <T> NetworkRequestProcessor startGetRequest(RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler) {
+    public <T> NetworkRequestProcessor startGetRequest(RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler, final Type type) {
         okhttp3.Request.Builder requestBuilder = new okhttp3.Request.Builder().url(requestContents.getGetMethodUrlWithParam());
         addRequestHeader(requestBuilder, requestContents);
         okhttp3.Request request = requestBuilder
@@ -141,7 +142,7 @@ public class NetworkRequestProcessorOkHttp implements NetworkRequestProcessor {
     }
 
     @Override
-    public <T> NetworkRequestProcessor startPostRequest(RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler) {
+    public <T> NetworkRequestProcessor startPostRequest(RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler, final Type type) {
         okhttp3.Request.Builder requestBuilder = new okhttp3.Request.Builder().url(requestContents.getUrl());
         addRequestHeader(requestBuilder, requestContents);
         MultipartBody.Builder multiPartBuilder = new MultipartBody.Builder()
@@ -183,7 +184,7 @@ public class NetworkRequestProcessorOkHttp implements NetworkRequestProcessor {
     }
 
     @Override
-    public <T> NetworkRequestProcessor startUploadRequest(RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler) {
+    public <T> NetworkRequestProcessor startUploadRequest(RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler, final Type type) {
         okhttp3.Request.Builder requestBuilder = new okhttp3.Request.Builder().url(requestContents.getUrl());
         addRequestHeader(requestBuilder, requestContents);
 

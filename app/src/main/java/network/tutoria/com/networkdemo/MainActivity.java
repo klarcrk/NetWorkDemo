@@ -11,8 +11,11 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.reflect.TypeToken;
+
 import java.io.File;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import network.tutoria.com.networkdemo.network.RequestBuilder;
 import network.tutoria.com.networkdemo.network.api.NetworkResultHandler;
@@ -30,9 +33,11 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                RequestBuilder.get("http://gank.io/api/data/休息视频/1/1").execute(new NetworkResultHandler<List<GanHuo>>() {
+                Map<String, String> headers = new HashMap<String, String>();
+                Map<String, String> params = new HashMap<String, String>();
+                RequestBuilder.get("http://gank.io/api/data/休息视频/1/1").addHeaders(headers).addParams(params).execute(new NetworkResultHandler<GanHuoResult>() {
                     @Override
-                    public void onLoadSuccess(List<GanHuo> result) {
+                    public void onLoadSuccess(GanHuoResult result) {
                         super.onLoadSuccess(result);
                         textView.setText(result.toString());
                     }
@@ -42,8 +47,8 @@ public class MainActivity extends AppCompatActivity {
                         super.onError(error);
                         textView.setText(error.getMessage());
                     }
-
-                });
+                }, new TypeToken<GanHuoResult>() {
+                }.getType());
             }
         });
     }
@@ -68,8 +73,35 @@ public class MainActivity extends AppCompatActivity {
             public void onError(Throwable error) {
                 textView.setText(error.getMessage());
             }
-        });
+        }, null);
     }
+
+    private void uploadFile(final TextView textView, File file) {
+        File uploadFile = file;
+        String url = "http://xxx.upload.com";
+        HashMap<String, File> uploadFilePart = new HashMap<>();
+        uploadFilePart.put("fileKey", uploadFile);
+        RequestBuilder.upload(url, uploadFilePart)
+                //.uploadFileMediaType("application/octet-stream")//标识上传文件的类型
+                .execute(new NetworkResultHandler<String>() {
+                    @Override
+                    public void onGetUploadProgress(int progress) {
+                        textView.setText(String.format("上传进度%d", progress));
+                    }
+
+                    @Override
+                    public void onLoadSuccess(String result) {
+                        textView.setText("上传完成");
+                    }
+
+                    @Override
+                    public void onError(Throwable error) {
+                        textView.setText(error.getMessage());
+                    }
+                }, new TypeToken<String>() {
+                }.getType());
+    }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {

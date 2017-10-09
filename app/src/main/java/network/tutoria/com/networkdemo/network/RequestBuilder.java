@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import java.io.File;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -15,10 +16,21 @@ import network.tutoria.com.networkdemo.network.api.NetworkResultHandler;
 import network.tutoria.com.networkdemo.network.retorfit.NetworkRequestRetrofitProcessor;
 
 /**
- * Created on 2017/9/28 15:33.
- * Project NetWorkDemo
- * Copyright (c) 2017 zzkko Inc. All rights reserved.
- * Licensed under the Apache License, Version 2.0 (the "License");                                              #
+ * 包含了所有的请求的数据信息
+ * 包含get post upload download的方法
+ * <p>
+ * RequestBuilder.get(“url")
+ * RequestBuilder.post(“url")
+ * RequestBuilder.download(“url",file)
+ * <p>
+ * RequestBuilder.upload(“url",filePart，“application/octet-stream")
+ * HashMap<String, File> filePart 上传文件对应的键值对
+ * <p>
+ * <p>
+ * addParam添加请求参数
+ * addHead添加请求头
+ * <p>
+ * RequestBuilder.get("http://gank.io/api/data/休息视频/1/1").execute(resultHandler,returnType)
  */
 
 public class RequestBuilder {
@@ -60,12 +72,12 @@ public class RequestBuilder {
     }
 
     //文件上传
-    public static RequestBuilder upload(@NonNull String url, @NonNull HashMap<String, File> filePart, @NonNull String mediaType) {
+    public static RequestBuilder upload(@NonNull String url, @NonNull HashMap<String, File> filePart) {
         return new RequestBuilder(METHOD_UPLOAD_FILE).url(url).uploadFilePart(filePart);
     }
 
     //文件类型 text/plain
-    private RequestBuilder uploadFileMediaType(String fileMediaType) {
+    public RequestBuilder uploadFileMediaType(String fileMediaType) {
         this.uploadFileMediaType = fileMediaType;
         return this;
     }
@@ -174,20 +186,20 @@ public class RequestBuilder {
         return this;
     }
 
-    public <T> void execute(@NonNull NetworkResultHandler<T> networkResultHandler) {
+    public <T> void execute(@NonNull NetworkResultHandler<T> networkResultHandler, Type type) {
         NetworkRequestProcessor requestProcessor = NetworkRequestRetrofitProcessor.getInstance();
         switch (requestMethod) {
             case METHOD_GET:
-                requestProcessor.startGetRequest(this, networkResultHandler);
+                requestProcessor.startGetRequest(this, networkResultHandler, type);
                 break;
             case METHOD_POST:
-                requestProcessor.startPostRequest(this, networkResultHandler);
+                requestProcessor.startPostRequest(this, networkResultHandler, type);
                 break;
             case METHOD_DOWNLOAD_FILE:
                 requestProcessor.startDownloadRequest(this, networkResultHandler);
                 break;
             case METHOD_UPLOAD_FILE:
-                requestProcessor.startUploadRequest(this, networkResultHandler);
+                requestProcessor.startUploadRequest(this, networkResultHandler, type);
                 break;
         }
     }

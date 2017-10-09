@@ -1,5 +1,7 @@
 package network.tutoria.com.networkdemo.network.api;
 
+import java.lang.reflect.Type;
+
 import network.tutoria.com.networkdemo.network.RequestBuilder;
 
 /**
@@ -11,11 +13,11 @@ import network.tutoria.com.networkdemo.network.RequestBuilder;
 
 public interface NetworkRequestProcessor {
 
-    <T> NetworkRequestProcessor startGetRequest(RequestBuilder requestBuilder, NetworkResultHandler<T> resultHandler);
+    <T> NetworkRequestProcessor startGetRequest(RequestBuilder requestBuilder, NetworkResultHandler<T> resultHandler, Type type);
 
-    <T> NetworkRequestProcessor startPostRequest(RequestBuilder requestBuilder, NetworkResultHandler<T> resultHandler);
+    <T> NetworkRequestProcessor startPostRequest(RequestBuilder requestBuilder, NetworkResultHandler<T> resultHandler, Type type);
 
-    <T> NetworkRequestProcessor startUploadRequest(RequestBuilder requestBuilder, NetworkResultHandler<T> resultHandler);
+    <T> NetworkRequestProcessor startUploadRequest(RequestBuilder requestBuilder, NetworkResultHandler<T> resultHandler, Type type);
 
     <T> NetworkRequestProcessor startDownloadRequest(RequestBuilder requestBuilder, NetworkResultHandler<T> resultHandler);
 

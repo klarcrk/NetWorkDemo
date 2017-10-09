@@ -22,13 +22,14 @@ import com.google.gson.reflect.TypeToken;
 import org.junit.Assert;
 
 import java.io.File;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
 import network.tutoria.com.networkdemo.network.GsonUtil;
+import network.tutoria.com.networkdemo.network.RequestBuilder;
 import network.tutoria.com.networkdemo.network.api.NetworkRequestProcessor;
 import network.tutoria.com.networkdemo.network.api.NetworkResultHandler;
-import network.tutoria.com.networkdemo.network.RequestBuilder;
 
 /**
  * Created on 2017/9/28 15:53.
@@ -78,7 +79,8 @@ public class NetworkRequestProcessorVolley implements NetworkRequestProcessor {
     }
 
 
-    public <T> NetworkRequestProcessor startGetRequest(RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler) {
+    @Override
+    public <T> NetworkRequestProcessor startGetRequest(RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler, final Type type) {
         final HashMap<String, String> headers = requestContents.getHeaders();
         StringRequest request = new StringRequest(Request.Method.GET, requestContents.getGetMethodUrlWithParam(), new Response.Listener<String>() {
             @Override
@@ -102,7 +104,7 @@ public class NetworkRequestProcessorVolley implements NetworkRequestProcessor {
     }
 
     @Override
-    public <T> NetworkRequestProcessor startPostRequest(RequestBuilder requestBuilder, final NetworkResultHandler<T> resultHandler) {
+    public <T> NetworkRequestProcessor startPostRequest(RequestBuilder requestBuilder, final NetworkResultHandler<T> resultHandler, final Type type) {
         final HashMap<String, String> headers = requestBuilder.getHeaders();
         final HashMap<String, String> requestParams = requestBuilder.getRequestParams();
         StringRequest request = new StringRequest(Request.Method.GET, requestBuilder.getUrl(), new Response.Listener<String>() {
@@ -132,7 +134,7 @@ public class NetworkRequestProcessorVolley implements NetworkRequestProcessor {
     }
 
     @Override
-    public <T> NetworkRequestProcessor startUploadRequest(RequestBuilder requestBuilder, final NetworkResultHandler<T> resultHandler) {
+    public <T> NetworkRequestProcessor startUploadRequest(RequestBuilder requestBuilder, final NetworkResultHandler<T> resultHandler, final Type type) {
         HashMap<String, String> headers = requestBuilder.getHeaders();
         String url = requestBuilder.getUrl();
         HashMap<String, String> requestParams = requestBuilder.getRequestParams();

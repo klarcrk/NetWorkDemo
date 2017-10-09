@@ -13,12 +13,13 @@ import com.androidnetworking.interfaces.UploadProgressListener;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.File;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 
 import network.tutoria.com.networkdemo.network.GsonUtil;
+import network.tutoria.com.networkdemo.network.RequestBuilder;
 import network.tutoria.com.networkdemo.network.api.NetworkRequestProcessor;
 import network.tutoria.com.networkdemo.network.api.NetworkResultHandler;
-import network.tutoria.com.networkdemo.network.RequestBuilder;
 
 /**
  * Created on 2017/9/28 15:53.
@@ -44,7 +45,8 @@ public class NetworkRequestProcessorAnImpl implements NetworkRequestProcessor {
         return netRequestProcessor;
     }
 
-    public <T> NetworkRequestProcessor startGetRequest(RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler) {
+    @Override
+    public <T> NetworkRequestProcessor startGetRequest(RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler, Type type) {
         HashMap<String, String> headers = requestContents.getHeaders();
         HashMap<String, String> requestParams = requestContents.getRequestParams();
         ANRequest.GetRequestBuilder getBuilder = AndroidNetworking.get(requestContents.getUrl());
@@ -65,7 +67,7 @@ public class NetworkRequestProcessorAnImpl implements NetworkRequestProcessor {
     }
 
     @Override
-    public <T> NetworkRequestProcessor startPostRequest(RequestBuilder requestBuilder, final NetworkResultHandler<T> resultHandler) {
+    public <T> NetworkRequestProcessor startPostRequest(RequestBuilder requestBuilder, final NetworkResultHandler<T> resultHandler, Type type) {
         HashMap<String, String> headers = requestBuilder.getHeaders();
         String url = requestBuilder.getUrl();
         HashMap<String, String> requestParams = requestBuilder.getRequestParams();
@@ -87,7 +89,7 @@ public class NetworkRequestProcessorAnImpl implements NetworkRequestProcessor {
     }
 
     @Override
-    public <T> NetworkRequestProcessor startUploadRequest(RequestBuilder requestBuilder, final NetworkResultHandler<T> resultHandler) {
+    public <T> NetworkRequestProcessor startUploadRequest(RequestBuilder requestBuilder, final NetworkResultHandler<T> resultHandler, Type type) {
         HashMap<String, String> headers = requestBuilder.getHeaders();
         String url = requestBuilder.getUrl();
         HashMap<String, String> requestParams = requestBuilder.getRequestParams();
