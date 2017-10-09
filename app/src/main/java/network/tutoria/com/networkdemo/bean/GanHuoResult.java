@@ -1,4 +1,4 @@
-package network.tutoria.com.networkdemo;
+package network.tutoria.com.networkdemo.bean;
 
 import java.util.List;
 

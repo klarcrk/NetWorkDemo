@@ -46,7 +46,7 @@ public class NetworkRequestProcessorAnImpl implements NetworkRequestProcessor {
     }
 
     @Override
-    public <T> NetworkRequestProcessor startGetRequest(RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler, Type type) {
+    public <T> void startGetRequest(RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler, Type type) {
         HashMap<String, String> headers = requestContents.getHeaders();
         HashMap<String, String> requestParams = requestContents.getRequestParams();
         ANRequest.GetRequestBuilder getBuilder = AndroidNetworking.get(requestContents.getUrl());
@@ -63,11 +63,10 @@ public class NetworkRequestProcessorAnImpl implements NetworkRequestProcessor {
                 resultHandler.onError(anError);
             }
         });
-        return this;
     }
 
     @Override
-    public <T> NetworkRequestProcessor startPostRequest(RequestBuilder requestBuilder, final NetworkResultHandler<T> resultHandler, Type type) {
+    public <T> void startPostRequest(RequestBuilder requestBuilder, final NetworkResultHandler<T> resultHandler, Type type) {
         HashMap<String, String> headers = requestBuilder.getHeaders();
         String url = requestBuilder.getUrl();
         HashMap<String, String> requestParams = requestBuilder.getRequestParams();
@@ -85,11 +84,10 @@ public class NetworkRequestProcessorAnImpl implements NetworkRequestProcessor {
                 resultHandler.onError(anError);
             }
         });
-        return this;
     }
 
     @Override
-    public <T> NetworkRequestProcessor startUploadRequest(RequestBuilder requestBuilder, final NetworkResultHandler<T> resultHandler, Type type) {
+    public <T> void startUploadRequest(RequestBuilder requestBuilder, final NetworkResultHandler<T> resultHandler, Type type) {
         HashMap<String, String> headers = requestBuilder.getHeaders();
         String url = requestBuilder.getUrl();
         HashMap<String, String> requestParams = requestBuilder.getRequestParams();
@@ -118,7 +116,6 @@ public class NetworkRequestProcessorAnImpl implements NetworkRequestProcessor {
                 resultHandler.onError(anError);
             }
         });
-        return this;
     }
 
     private <T> void parseResponseStringResult(String response, final NetworkResultHandler<T> resultHandler) {
@@ -138,7 +135,7 @@ public class NetworkRequestProcessorAnImpl implements NetworkRequestProcessor {
     }
 
     @Override
-    public <T> NetworkRequestProcessor startDownloadRequest(RequestBuilder requestBuilder, final NetworkResultHandler<T> resultHandler) {
+    public <T> void startDownloadRequest(RequestBuilder requestBuilder, final NetworkResultHandler<T> resultHandler) {
         HashMap<String, String> headers = requestBuilder.getHeaders();
         String url = requestBuilder.getUrl();
         final File downloadTargetFile = requestBuilder.getDownloadTargetFile();
@@ -167,15 +164,13 @@ public class NetworkRequestProcessorAnImpl implements NetworkRequestProcessor {
                         resultHandler.onError(error);
                     }
                 });
-        return this;
     }
 
     //请求
     //返回数据
     @Override
-    public NetworkRequestProcessor cancelRequest(RequestBuilder requestBuilder) {
+    public void cancelRequest(RequestBuilder requestBuilder) {
         AndroidNetworking.cancel(requestBuilder);
-        return this;
     }
 
 

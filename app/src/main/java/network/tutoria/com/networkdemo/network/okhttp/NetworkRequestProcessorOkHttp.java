@@ -108,7 +108,7 @@ public class NetworkRequestProcessorOkHttp implements NetworkRequestProcessor {
         return requestBuilder.build();
     }
 
-    public <T> NetworkRequestProcessor startGetRequest(RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler, final Type type) {
+    public <T> void startGetRequest(RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler, final Type type) {
         okhttp3.Request.Builder requestBuilder = new okhttp3.Request.Builder().url(requestContents.getGetMethodUrlWithParam());
         addRequestHeader(requestBuilder, requestContents);
         okhttp3.Request request = requestBuilder
@@ -138,11 +138,10 @@ public class NetworkRequestProcessorOkHttp implements NetworkRequestProcessor {
                 parseResponseStringResult(response.body().string(), resultHandler);
             }
         });
-        return this;
     }
 
     @Override
-    public <T> NetworkRequestProcessor startPostRequest(RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler, final Type type) {
+    public <T> void startPostRequest(RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler, final Type type) {
         okhttp3.Request.Builder requestBuilder = new okhttp3.Request.Builder().url(requestContents.getUrl());
         addRequestHeader(requestBuilder, requestContents);
         MultipartBody.Builder multiPartBuilder = new MultipartBody.Builder()
@@ -180,11 +179,10 @@ public class NetworkRequestProcessorOkHttp implements NetworkRequestProcessor {
                 parseResponseStringResult(response.body().string(), resultHandler);
             }
         });
-        return this;
     }
 
     @Override
-    public <T> NetworkRequestProcessor startUploadRequest(RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler, final Type type) {
+    public <T> void startUploadRequest(RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler, final Type type) {
         okhttp3.Request.Builder requestBuilder = new okhttp3.Request.Builder().url(requestContents.getUrl());
         addRequestHeader(requestBuilder, requestContents);
 
@@ -268,12 +266,11 @@ public class NetworkRequestProcessorOkHttp implements NetworkRequestProcessor {
                 parseResponseStringResult(response.body().string(), resultHandler);
             }
         });
-        return this;
     }
 
 
     @Override
-    public <T> NetworkRequestProcessor startDownloadRequest(RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler) {
+    public <T> void startDownloadRequest(RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler) {
         final File downloadTargetFile = requestContents.getDownloadTargetFile();
         okhttp3.Request.Builder requestBuilder = new okhttp3.Request.Builder().url(requestContents.getGetMethodUrlWithParam());
         addRequestHeader(requestBuilder, requestContents);
@@ -346,12 +343,11 @@ public class NetworkRequestProcessorOkHttp implements NetworkRequestProcessor {
                 resultHandler.onDownloadSuccess(downloadTargetFile);
             }
         });
-        return this;
     }
 
     //根据RequestBuilder取消请求
     @Override
-    public NetworkRequestProcessor cancelRequest(@android.support.annotation.NonNull RequestBuilder requestBuilder) {
+    public void cancelRequest(@android.support.annotation.NonNull RequestBuilder requestBuilder) {
         for (Call call : okHttpClient.dispatcher().queuedCalls()) {
             if (requestBuilder == call.request().tag()) {
                 call.cancel();
@@ -362,7 +358,6 @@ public class NetworkRequestProcessorOkHttp implements NetworkRequestProcessor {
                 call.cancel();
             }
         }
-        return this;
     }
 
 

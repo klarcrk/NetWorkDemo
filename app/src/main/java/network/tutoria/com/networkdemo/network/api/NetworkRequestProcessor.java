@@ -13,13 +13,13 @@ import network.tutoria.com.networkdemo.network.RequestBuilder;
 
 public interface NetworkRequestProcessor {
 
-    <T> NetworkRequestProcessor startGetRequest(RequestBuilder requestBuilder, NetworkResultHandler<T> resultHandler, Type type);
+    <T> void startGetRequest(RequestBuilder requestBuilder, NetworkResultHandler<T> resultHandler, Type type);
 
-    <T> NetworkRequestProcessor startPostRequest(RequestBuilder requestBuilder, NetworkResultHandler<T> resultHandler, Type type);
+    <T> void startPostRequest(RequestBuilder requestBuilder, NetworkResultHandler<T> resultHandler, Type type);
 
-    <T> NetworkRequestProcessor startUploadRequest(RequestBuilder requestBuilder, NetworkResultHandler<T> resultHandler, Type type);
+    <T> void startUploadRequest(RequestBuilder requestBuilder, NetworkResultHandler<T> resultHandler, Type type);
 
-    <T> NetworkRequestProcessor startDownloadRequest(RequestBuilder requestBuilder, NetworkResultHandler<T> resultHandler);
+    <T> void startDownloadRequest(RequestBuilder requestBuilder, NetworkResultHandler<T> resultHandler);
 
-    NetworkRequestProcessor cancelRequest(RequestBuilder requestBuilder);
+    void cancelRequest(RequestBuilder requestBuilder);
 }

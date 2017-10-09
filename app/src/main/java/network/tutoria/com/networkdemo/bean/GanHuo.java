@@ -1,4 +1,4 @@
-package network.tutoria.com.networkdemo;
+package network.tutoria.com.networkdemo.bean;
 
 /**
  * Created on 2017/9/30 18:20.

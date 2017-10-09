@@ -80,7 +80,7 @@ public class NetworkRequestProcessorVolley implements NetworkRequestProcessor {
 
 
     @Override
-    public <T> NetworkRequestProcessor startGetRequest(RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler, final Type type) {
+    public <T> void startGetRequest(RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler, final Type type) {
         final HashMap<String, String> headers = requestContents.getHeaders();
         StringRequest request = new StringRequest(Request.Method.GET, requestContents.getGetMethodUrlWithParam(), new Response.Listener<String>() {
             @Override
@@ -100,11 +100,10 @@ public class NetworkRequestProcessorVolley implements NetworkRequestProcessor {
             }
         };
         request.setTag(requestContents);
-        return this;
     }
 
     @Override
-    public <T> NetworkRequestProcessor startPostRequest(RequestBuilder requestBuilder, final NetworkResultHandler<T> resultHandler, final Type type) {
+    public <T> void startPostRequest(RequestBuilder requestBuilder, final NetworkResultHandler<T> resultHandler, final Type type) {
         final HashMap<String, String> headers = requestBuilder.getHeaders();
         final HashMap<String, String> requestParams = requestBuilder.getRequestParams();
         StringRequest request = new StringRequest(Request.Method.GET, requestBuilder.getUrl(), new Response.Listener<String>() {
@@ -130,11 +129,10 @@ public class NetworkRequestProcessorVolley implements NetworkRequestProcessor {
             }
         };
         request.setTag(requestBuilder);
-        return this;
     }
 
     @Override
-    public <T> NetworkRequestProcessor startUploadRequest(RequestBuilder requestBuilder, final NetworkResultHandler<T> resultHandler, final Type type) {
+    public <T> void startUploadRequest(RequestBuilder requestBuilder, final NetworkResultHandler<T> resultHandler, final Type type) {
         HashMap<String, String> headers = requestBuilder.getHeaders();
         String url = requestBuilder.getUrl();
         HashMap<String, String> requestParams = requestBuilder.getRequestParams();
@@ -163,17 +161,15 @@ public class NetworkRequestProcessorVolley implements NetworkRequestProcessor {
                 resultHandler.onError(anError);
             }
         });
-        return this;
     }
 
 
     @Override
-    public <T> NetworkRequestProcessor startDownloadRequest(RequestBuilder requestBuilder, final NetworkResultHandler<T> resultHandler) {
+    public <T> void startDownloadRequest(RequestBuilder requestBuilder, final NetworkResultHandler<T> resultHandler) {
         HashMap<String, String> headers = requestBuilder.getHeaders();
         String url = requestBuilder.getUrl();
         final File downloadTargetFile = requestBuilder.getDownloadTargetFile();
-        AndroidNetworking.download(url, downloadTargetFile.getParentFile().getAbsolutePath(), downloadTargetFile.getName())
-                .addHeaders(headers).setTag(requestBuilder)
+        AndroidNetworking.download(url, downloadTargetFile.getParentFile().getAbsolutePath(), downloadTargetFile.getName()).addHeaders(headers).setTag(requestBuilder)
                 .setPriority(Priority.MEDIUM)
                 .setPercentageThresholdForCancelling(50) // even if at the time of cancelling it will not cancel if 50%
                 .build()                                 // downloading is done.But can be cancalled with forceCancel.
@@ -197,15 +193,13 @@ public class NetworkRequestProcessorVolley implements NetworkRequestProcessor {
                         resultHandler.onError(error);
                     }
                 });
-        return this;
     }
 
     //请求
     //返回数据
     @Override
-    public NetworkRequestProcessor cancelRequest(RequestBuilder requestBuilder) {
+    public void cancelRequest(RequestBuilder requestBuilder) {
         AndroidNetworking.cancel(requestBuilder);
-        return this;
     }
 
 

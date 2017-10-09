@@ -17,6 +17,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import network.tutoria.com.networkdemo.bean.GanHuoResult;
 import network.tutoria.com.networkdemo.network.RequestBuilder;
 import network.tutoria.com.networkdemo.network.api.NetworkResultHandler;
 

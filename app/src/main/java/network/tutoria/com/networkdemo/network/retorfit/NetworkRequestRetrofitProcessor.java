@@ -3,6 +3,8 @@ package network.tutoria.com.networkdemo.network.retorfit;
 import android.content.Context;
 import android.util.Log;
 
+import com.google.gson.reflect.TypeToken;
+
 import org.junit.Assert;
 
 import java.io.File;
@@ -67,7 +69,7 @@ public class NetworkRequestRetrofitProcessor implements NetworkRequestProcessor 
         Retrofit.Builder retrofitBuilder = new Retrofit.Builder();
         retrofitBuilder.addCallAdapterFactory(RxJava2CallAdapterFactory.create());
         retrofitBuilder.addConverterFactory(GsonConverterFactory.create());
-        //不需要base url
+        //不需要base url 随便填个
         retrofitBuilder.baseUrl("http://example.com/api/");
         okHttpClient = new OkHttpClient.Builder()
                 .build();
@@ -76,16 +78,17 @@ public class NetworkRequestRetrofitProcessor implements NetworkRequestProcessor 
         requestService = retrofit.create(RetrofitRequestService.class);
     }
 
-    private <T> T parseStringToObject(String response,Type type) throws Exception {
+    private <T> T parseStringToObject(String response, Type type) throws Exception {
         return GsonUtil.getGson().fromJson(response, type);
     }
 
-    public <T> NetworkRequestProcessor startGetRequest(RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler, final Type type) {
+    public <T> void startGetRequest(RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler, final Type type) {
+        Type type1 = new TypeToken<T>() { }.getType();
         Observable<ResponseBody> responseBodyObservable = requestService.get(requestContents.getHeaders(), requestContents.getUrl(), requestContents.getRequestParams());
         responseBodyObservable.map(new Function<ResponseBody, T>() {
             @Override
             public T apply(@NonNull ResponseBody responseBody) throws Exception {
-                T result = parseStringToObject(responseBody.string(),type);
+                T result = parseStringToObject(responseBody.string(), type);
                 return result;
             }
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
@@ -103,15 +106,14 @@ public class NetworkRequestRetrofitProcessor implements NetworkRequestProcessor 
                         resultHandler.onError(throwable);
                     }
                 });
-        return this;
     }
 
     @Override
-    public <T> NetworkRequestProcessor startPostRequest(RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler, final Type type) {
+    public <T> void startPostRequest(RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler, final Type type) {
         Observable<T> request = requestService.post(requestContents.getHeaders(), requestContents.getUrl(), requestContents.getRequestParams()).map(new Function<ResponseBody, T>() {
             @Override
             public T apply(@NonNull ResponseBody responseBody) throws Exception {
-                return parseStringToObject(responseBody.string(),type);
+                return parseStringToObject(responseBody.string(), type);
             }
         });
         request.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<T>() {
@@ -125,11 +127,10 @@ public class NetworkRequestRetrofitProcessor implements NetworkRequestProcessor 
                 resultHandler.onError(throwable);
             }
         });
-        return this;
     }
 
     @Override
-    public <T> NetworkRequestProcessor startUploadRequest(RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler, final Type type) {
+    public <T> void startUploadRequest(RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler, final Type type) {
         MultipartBody.Builder multiPartBuilder = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM);
         HashMap<String, String> requestParams = requestContents.getRequestParams();
@@ -198,12 +199,11 @@ public class NetworkRequestRetrofitProcessor implements NetworkRequestProcessor 
                 resultHandler.onError(throwable);
             }
         });
-        return this;
     }
 
 
     @Override
-    public <T> NetworkRequestProcessor startDownloadRequest(RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler) {
+    public <T> void startDownloadRequest(RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler) {
         final File downloadTargetFile = requestContents.getDownloadTargetFile();
         Observable<ResponseBody> responseBodyObservable = requestService.downloadFile(requestContents.getHeaders(), requestContents.getUrl(), requestContents.getRequestParams());
         final PublishProcessor<Integer> publishProcessor = PublishProcessor.create();
@@ -262,12 +262,11 @@ public class NetworkRequestRetrofitProcessor implements NetworkRequestProcessor 
                 resultHandler.onDownloadSuccess(downloadTargetFile);
             }
         });
-        return this;
     }
 
     //根据RequestBuilder取消请求
     @Override
-    public NetworkRequestProcessor cancelRequest(@android.support.annotation.NonNull RequestBuilder requestBuilder) {
+    public void cancelRequest(@android.support.annotation.NonNull RequestBuilder requestBuilder) {
         for (Call call : okHttpClient.dispatcher().queuedCalls()) {
             if (requestBuilder == call.request().tag()) {
                 call.cancel();
@@ -278,7 +277,6 @@ public class NetworkRequestRetrofitProcessor implements NetworkRequestProcessor 
                 call.cancel();
             }
         }
-        return this;
     }
 
 
