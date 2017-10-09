@@ -180,7 +180,9 @@ public class RequestBuilder {
         return headers;
     }
 
-    public <T> void execute(@NonNull NetworkResultHandler<T> networkResultHandler, Type type) {
+
+
+    public <T> void execute(Type type, @NonNull NetworkResultHandler<T> networkResultHandler) {
         NetworkRequestProcessor requestProcessor = NetworkRequestRetrofitProcessor.getInstance();
         switch (requestMethod) {
             case METHOD_GET:

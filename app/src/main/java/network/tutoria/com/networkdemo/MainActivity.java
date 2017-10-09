@@ -11,8 +11,6 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.reflect.TypeToken;
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Map<String, String> headers = new HashMap<String, String>();
                 Map<String, String> params = new HashMap<String, String>();
-                RequestBuilder.get("http://gank.io/api/data/休息视频/1/1").addHeaders(headers).addParams(params).execute(new NetworkResultHandler<GanHuoResult>() {
+                RequestBuilder.get("http://gank.io/api/data/休息视频/1/1").addHeaders(headers).addParams(params).execute(GanHuoResult.class, new NetworkResultHandler<GanHuoResult>() {
                     @Override
                     public void onLoadSuccess(GanHuoResult result) {
                         super.onLoadSuccess(result);
@@ -48,8 +46,7 @@ public class MainActivity extends AppCompatActivity {
                         super.onError(error);
                         textView.setText(error.getMessage());
                     }
-                }, new TypeToken<GanHuoResult>() {
-                }.getType());
+                });
             }
         });
     }
@@ -58,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
         File storageDirectory = Environment.getExternalStorageDirectory();
         String url = "http://dl-cdn.coolapkmarket.com/down/apk_file/2017/0818/com.coolapk.market-7.9.7-1708181.apk?_upt=5459fcd61506766821";
         File targetFile = new File(storageDirectory, "kuku.apk");
-        RequestBuilder.download(url, targetFile).execute(new NetworkResultHandler<String>() {
+        RequestBuilder.download(url, targetFile).execute(null,new NetworkResultHandler<String>() {
             @Override
             public void onDownloadSuccess(File downloadFile) {
                 textView.setText("下载进度完成");
@@ -74,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
             public void onError(Throwable error) {
                 textView.setText(error.getMessage());
             }
-        }, null);
+        });
     }
 
     private void uploadFile(final TextView textView, File file) {
@@ -84,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
         uploadFilePart.put("fileKey", uploadFile);
         RequestBuilder.upload(url, uploadFilePart)
                 //.uploadFileMediaType("application/octet-stream")//标识上传文件的类型
-                .execute(new NetworkResultHandler<String>() {
+                .execute(String.class,new NetworkResultHandler<String>() {
                     @Override
                     public void onGetUploadProgress(int progress) {
                         textView.setText(String.format("上传进度%d", progress));
@@ -99,8 +96,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onError(Throwable error) {
                         textView.setText(error.getMessage());
                     }
-                }, new TypeToken<String>() {
-                }.getType());
+                });
     }
 
 
