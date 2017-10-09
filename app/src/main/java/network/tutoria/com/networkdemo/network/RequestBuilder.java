@@ -57,7 +57,6 @@ public class RequestBuilder {
     private HashMap<String, String> requestParams = new HashMap<>();
     private HashMap<String, String> headers = new HashMap<>();
 
-    private NetworkResultHandler networkResultHandler;
 
     private File downloadTargetFile;
 
@@ -179,11 +178,6 @@ public class RequestBuilder {
 
     public HashMap<String, String> getHeaders() {
         return headers;
-    }
-
-    public RequestBuilder setResultHandler(NetworkResultHandler networkResultHandler) {
-        this.networkResultHandler = networkResultHandler;
-        return this;
     }
 
     public <T> void execute(@NonNull NetworkResultHandler<T> networkResultHandler, Type type) {
