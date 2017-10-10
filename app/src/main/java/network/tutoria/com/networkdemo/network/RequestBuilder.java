@@ -47,6 +47,19 @@ public class RequestBuilder {
 
     }
 
+    private Object tag;//请求的标识 默认是RequestBuilder本身
+
+    public void setTag(Object tag) {
+        this.tag = tag;
+    }
+
+    public Object getTag() {
+        if (tag == null) {
+            return this;
+        }
+        return tag;
+    }
+
     //get请求
     public static RequestBuilder get(@NonNull String url) {
         return new RequestBuilder(METHOD_GET).url(url);
@@ -64,6 +77,19 @@ public class RequestBuilder {
 
     public static RequestBuilder download(@NonNull String url, File downloadTargetFile) {
         return new RequestBuilder(METHOD_DOWNLOAD_FILE).url(url).downloadFile(downloadTargetFile);
+    }
+
+    private boolean parsableFlag = true;
+
+    /*
+      *设置为false 则不解析返回结果
+     */
+    public void setParsableFlag(boolean parsableFlag) {
+        this.parsableFlag = parsableFlag;
+    }
+
+    public boolean isParsableFlag() {
+        return parsableFlag;
     }
 
     private String url; //url 肯定不能为空

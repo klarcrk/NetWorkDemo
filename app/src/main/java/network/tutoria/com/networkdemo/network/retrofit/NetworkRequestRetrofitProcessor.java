@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
@@ -26,7 +27,6 @@ import network.tutoria.com.networkdemo.network.RequestError;
 import network.tutoria.com.networkdemo.network.api.CustomParser;
 import network.tutoria.com.networkdemo.network.api.NetworkRequestProcessor;
 import network.tutoria.com.networkdemo.network.api.NetworkResultHandler;
-import okhttp3.Call;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -94,18 +94,23 @@ public class NetworkRequestRetrofitProcessor implements NetworkRequestProcessor 
     }
 
     private <T> T parseResponseBody(@NonNull ResponseBody responseBody, RequestBuilder requestContents, Type type) throws Exception {
-        String resultData = responseBody.string();
-        try {
-            return parseStringToObject(requestContents, resultData, type);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RequestError().setError(e).setRequestResult(resultData);
+        if (requestContents.isParsableFlag()) {
+            String resultData = responseBody.string();
+            try {
+                return parseStringToObject(requestContents, resultData, type);
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new RequestError().setError(e).setRequestResult(resultData);
+            }
+        } else {
+            //不能解析 直接返回空值了
+            return null;
         }
     }
 
     public <T> void startGetRequest(final RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler, final Type type) {
         Observable<ResponseBody> responseBodyObservable = requestService.get(requestContents.getHeaders(), requestContents.getUrl(), requestContents.getRequestParams());
-        responseBodyObservable.map(new Function<ResponseBody, T>() {
+        Disposable disposable = responseBodyObservable.map(new Function<ResponseBody, T>() {
             @Override
             public T apply(@NonNull ResponseBody responseBody) throws Exception {
                 return parseResponseBody(responseBody, requestContents, type);
@@ -115,13 +120,19 @@ public class NetworkRequestRetrofitProcessor implements NetworkRequestProcessor 
                     @Override
                     public void accept(T t) throws Exception {
                         resultHandler.onLoadSuccess(t);
+                        //结果返回了 删除管理的请求
+                        RequestManager.get().removeTag(requestContents.getTag());
                     }
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
                         onGetError(resultHandler, throwable);
+                        //结果返回了 删除管理的请求
+                        RequestManager.get().removeTag(requestContents.getTag());
                     }
                 });
+        //管理请求
+        RequestManager.get().addTag(requestContents.getTag(), disposable);
     }
 
     @Override
@@ -132,17 +143,23 @@ public class NetworkRequestRetrofitProcessor implements NetworkRequestProcessor 
                 return parseResponseBody(responseBody, requestContents, type);
             }
         });
-        request.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<T>() {
+        Disposable disposable = request.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<T>() {
             @Override
             public void accept(T t) throws Exception {
                 resultHandler.onLoadSuccess(t);
+                //结果返回了 删除管理的请求
+                RequestManager.get().removeTag(requestContents.getTag());
             }
         }, new Consumer<Throwable>() {
             @Override
             public void accept(Throwable throwable) throws Exception {
                 onGetError(resultHandler, throwable);
+                //结果返回了 删除管理的请求
+                RequestManager.get().removeTag(requestContents.getTag());
             }
         });
+        //管理请求
+        RequestManager.get().addTag(requestContents.getTag(), disposable);
     }
 
     @Override
@@ -204,26 +221,32 @@ public class NetworkRequestRetrofitProcessor implements NetworkRequestProcessor 
         for (UploadPostBody uploadPostBody : uploadPostBodies) {
             uploadPostBody.setListener(progressChangedListener);
         }
-        uploadRequest.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<T>() {
+        Disposable disposable = uploadRequest.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<T>() {
             @Override
             public void accept(T t) throws Exception {
                 resultHandler.onLoadSuccess(t);
+                //结果返回了 删除管理的请求
+                RequestManager.get().removeTag(requestContents.getTag());
             }
         }, new Consumer<Throwable>() {
             @Override
             public void accept(Throwable throwable) throws Exception {
-                onGetError(resultHandler,throwable);
+                onGetError(resultHandler, throwable);
+                //结果返回了 删除管理的请求
+                RequestManager.get().removeTag(requestContents.getTag());
             }
         });
+        //管理请求
+        RequestManager.get().addTag(requestContents.getTag(), disposable);
     }
 
 
     @Override
-    public <T> void startDownloadRequest(RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler) {
+    public <T> void startDownloadRequest(final RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler) {
         final File downloadTargetFile = requestContents.getDownloadTargetFile();
         Observable<ResponseBody> responseBodyObservable = requestService.downloadFile(requestContents.getHeaders(), requestContents.getUrl(), requestContents.getRequestParams());
         final PublishProcessor<Integer> publishProcessor = PublishProcessor.create();
-        responseBodyObservable.subscribeOn(Schedulers.io()).map(new Function<ResponseBody, File>() {
+        Disposable disposable = responseBodyObservable.subscribeOn(Schedulers.io()).map(new Function<ResponseBody, File>() {
             @Override
             public File apply(@NonNull ResponseBody responseBody) throws Exception {
                 InputStream inputStream = responseBody.byteStream();
@@ -255,14 +278,19 @@ public class NetworkRequestRetrofitProcessor implements NetworkRequestProcessor 
         }).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<File>() {
             @Override
             public void accept(File file) throws Exception {
-
+                //结果返回了 删除管理的请求
+                RequestManager.get().removeTag(requestContents.getTag());
             }
         }, new Consumer<Throwable>() {
             @Override
             public void accept(Throwable throwable) throws Exception {
                 resultHandler.onError(new RequestError().setError(throwable));
+                //结果返回了 删除管理的请求
+                RequestManager.get().removeTag(requestContents.getTag());
             }
         });
+        //管理请求
+        RequestManager.get().addTag(requestContents.getTag(), disposable);
         publishProcessor.sample(100, TimeUnit.MILLISECONDS).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<Integer>() {
             @Override
             public void accept(Integer integer) throws Exception {
@@ -283,17 +311,9 @@ public class NetworkRequestRetrofitProcessor implements NetworkRequestProcessor 
 
     //根据RequestBuilder取消请求
     @Override
-    public void cancelRequest(@android.support.annotation.NonNull RequestBuilder requestBuilder) {
-        for (Call call : okHttpClient.dispatcher().queuedCalls()) {
-            if (requestBuilder == call.request().tag()) {
-                call.cancel();
-            }
-        }
-        for (Call call : okHttpClient.dispatcher().runningCalls()) {
-            if (requestBuilder == call.request().tag()) {
-                call.cancel();
-            }
-        }
+    public void cancelRequest(@NonNull RequestBuilder requestBuilder) {
+        //结果返回了 删除管理的请求
+        RequestManager.get().removeTag(requestBuilder.getTag(), true);
     }
 
 

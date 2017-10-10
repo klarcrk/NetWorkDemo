@@ -25,9 +25,14 @@ public class DemoRequest extends RequestBase {
         this.password = password;
     }
 
-    public void doRegister(NetworkResultHandler<LoginBean> networkResultHandler) {
+    public void doRegister(NetworkResultHandler<Object> networkResultHandler) {
         cancelPreRequest();
-        requestBuilder = RequestBuilder.get("http://gank.io/api/data/休息视频/1/1").addParam("regist", email).addParam("password", password).doRequest(LoginBean.class, networkResultHandler);
+        RequestBuilder requestBuilder = RequestBuilder.get("http://gank.io/api/data/休息视频/1/1").addParam("regist", email).addParam("password", password).setCustomParser(new CustomParser() {
+            @Override
+            public Object parseResult(Type type, String result) {
+                return null;
+            }
+        }).doRequest(LoginBean.class, networkResultHandler);
     }
 
 
