@@ -1,14 +1,7 @@
-package network.tutoria.com.networkdemo.network.other.volley;
+package network.tutoria.com.networkdemo.other.animpl;
 
 import android.content.Context;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.ANRequest;
 import com.androidnetworking.common.Priority;
@@ -19,12 +12,9 @@ import com.androidnetworking.interfaces.StringRequestListener;
 import com.androidnetworking.interfaces.UploadProgressListener;
 import com.google.gson.reflect.TypeToken;
 
-import org.junit.Assert;
-
 import java.io.File;
 import java.lang.reflect.Type;
 import java.util.HashMap;
-import java.util.Map;
 
 import network.tutoria.com.networkdemo.network.GsonUtil;
 import network.tutoria.com.networkdemo.network.RequestBuilder;
@@ -38,101 +28,66 @@ import network.tutoria.com.networkdemo.network.api.NetworkResultHandler;
  * Licensed under the Apache License, Version 2.0 (the "License");                                              #
  */
 
-public class NetworkRequestProcessorVolley implements NetworkRequestProcessor {
+public class NetworkRequestProcessorAnImpl implements NetworkRequestProcessor {
 
 
     private static NetworkRequestProcessor netRequestProcessor;
 
+    public static void init(Context context) {
+        //执行框架 初始化 在application中调用一次
+        AndroidNetworking.initialize(context);
+    }
+
     public static NetworkRequestProcessor getInstance() {
-        Assert.assertNotNull("init this before use it", queue);
         if (netRequestProcessor == null) {
-            netRequestProcessor = new NetworkRequestProcessorVolley();
+            netRequestProcessor = new NetworkRequestProcessorAnImpl();
         }
         return netRequestProcessor;
     }
 
-    private static RequestQueue queue;
-
-    public static void init(Context context) {
-        //执行框架 初始化 在application中调用一次
-        queue = Volley.newRequestQueue(context);
-    }
-
-    private void checkIsInitialed() {
-        Assert.assertNotNull(queue);
-    }
-
-    private <T> void parseResponseStringResult(String response, final NetworkResultHandler<T> resultHandler) {
-        //TODO 用rxjava切换到子线程中解析
-        try {
-            T result = parseStringToObject(response);
-            resultHandler.onLoadSuccess(result);
-        } catch (Exception e) {
-            e.printStackTrace();
-            resultHandler.onError(e);
-        }
-    }
-
-    private <T> T parseStringToObject(String response) throws Exception {
-        return GsonUtil.getGson().fromJson(response, new TypeToken<T>() {
-        }.getType());
-    }
-
-
     @Override
-    public <T> void startGetRequest(RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler, final Type type) {
-        final HashMap<String, String> headers = requestContents.getHeaders();
-        StringRequest request = new StringRequest(Request.Method.GET, requestContents.getGetMethodUrlWithParam(), new Response.Listener<String>() {
+    public <T> void startGetRequest(RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler, Type type) {
+        HashMap<String, String> headers = requestContents.getHeaders();
+        HashMap<String, String> requestParams = requestContents.getRequestParams();
+        ANRequest.GetRequestBuilder getBuilder = AndroidNetworking.get(requestContents.getUrl());
+        getBuilder.addQueryParameter(requestParams);
+        getBuilder.addHeaders(headers);
+        getBuilder.build().getAsString(new StringRequestListener() {
             @Override
             public void onResponse(String response) {
                 parseResponseStringResult(response, resultHandler);
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                resultHandler.onError(error);
-            }
 
-        }) {
             @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                return headers;
+            public void onError(ANError anError) {
+                resultHandler.onError(anError);
             }
-        };
-        request.setTag(requestContents);
+        });
     }
 
     @Override
-    public <T> void startPostRequest(RequestBuilder requestBuilder, final NetworkResultHandler<T> resultHandler, final Type type) {
-        final HashMap<String, String> headers = requestBuilder.getHeaders();
-        final HashMap<String, String> requestParams = requestBuilder.getRequestParams();
-        StringRequest request = new StringRequest(Request.Method.GET, requestBuilder.getUrl(), new Response.Listener<String>() {
+    public <T> void startPostRequest(RequestBuilder requestBuilder, final NetworkResultHandler<T> resultHandler, Type type) {
+        HashMap<String, String> headers = requestBuilder.getHeaders();
+        String url = requestBuilder.getUrl();
+        HashMap<String, String> requestParams = requestBuilder.getRequestParams();
+        ANRequest.PostRequestBuilder postRequestBuilder = AndroidNetworking.post(url);
+        postRequestBuilder.addBodyParameter(requestParams);
+        postRequestBuilder.addHeaders(headers);
+        postRequestBuilder.build().getAsString(new StringRequestListener() {
             @Override
             public void onResponse(String response) {
                 parseResponseStringResult(response, resultHandler);
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                resultHandler.onError(error);
-            }
-
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                return headers;
-            }
 
             @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                return requestParams;
+            public void onError(ANError anError) {
+                resultHandler.onError(anError);
             }
-        };
-        request.setTag(requestBuilder);
+        });
     }
 
     @Override
-    public <T> void startUploadRequest(RequestBuilder requestBuilder, final NetworkResultHandler<T> resultHandler, final Type type) {
+    public <T> void startUploadRequest(RequestBuilder requestBuilder, final NetworkResultHandler<T> resultHandler, Type type) {
         HashMap<String, String> headers = requestBuilder.getHeaders();
         String url = requestBuilder.getUrl();
         HashMap<String, String> requestParams = requestBuilder.getRequestParams();
@@ -163,13 +118,29 @@ public class NetworkRequestProcessorVolley implements NetworkRequestProcessor {
         });
     }
 
+    private <T> void parseResponseStringResult(String response, final NetworkResultHandler<T> resultHandler) {
+        //TODO 用rxjava切换到子线程中解析
+        try {
+            T result = parseStringToObject(response);
+            resultHandler.onLoadSuccess(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            resultHandler.onError(e);
+        }
+    }
+
+    private <T> T parseStringToObject(String response) throws Exception {
+        return GsonUtil.getGson().fromJson(response, new TypeToken<T>() {
+        }.getType());
+    }
 
     @Override
     public <T> void startDownloadRequest(RequestBuilder requestBuilder, final NetworkResultHandler<T> resultHandler) {
         HashMap<String, String> headers = requestBuilder.getHeaders();
         String url = requestBuilder.getUrl();
         final File downloadTargetFile = requestBuilder.getDownloadTargetFile();
-        AndroidNetworking.download(url, downloadTargetFile.getParentFile().getAbsolutePath(), downloadTargetFile.getName()).addHeaders(headers).setTag(requestBuilder)
+        AndroidNetworking.download(url, downloadTargetFile.getParentFile().getAbsolutePath(), downloadTargetFile.getName())
+                .addHeaders(headers).setTag(requestBuilder)
                 .setPriority(Priority.MEDIUM)
                 .setPercentageThresholdForCancelling(50) // even if at the time of cancelling it will not cancel if 50%
                 .build()                                 // downloading is done.But can be cancalled with forceCancel.

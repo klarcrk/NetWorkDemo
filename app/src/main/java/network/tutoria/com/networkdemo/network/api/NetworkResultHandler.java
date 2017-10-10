@@ -2,6 +2,8 @@ package network.tutoria.com.networkdemo.network.api;
 
 import java.io.File;
 
+import network.tutoria.com.networkdemo.network.RequestError;
+
 /**
  * Created on 2017/9/28 15:27.
  * Project NetWorkDemo
@@ -9,29 +11,25 @@ import java.io.File;
  * Licensed under the Apache License, Version 2.0 (the "License");                                              #
  */
 
-public abstract class NetworkResultHandler<T> implements NetworkResultInterface<T> {
+public abstract class NetworkResultHandler<T> {
 
-    @Override
-    public void onError(Throwable error) {
-
+    public void onError(RequestError error) {
     }
 
-    @Override
+    //接口数据加载完成
     public void onLoadSuccess(T result) {
-
     }
 
-    @Override
     public void onGetUploadProgress(int progress) {
 
     }
 
-    @Override
+    //下载文件进度更新
     public void onGetDownloadProgress(int progress) {
 
     }
 
-    @Override
+    //下载文件完成
     public void onDownloadSuccess(File downloadFile) {
 
     }

@@ -1,7 +1,6 @@
-package network.tutoria.com.networkdemo.network.retorfit;
+package network.tutoria.com.networkdemo.network.retrofit;
 
 import android.content.Context;
-import android.util.Log;
 
 import org.junit.Assert;
 
@@ -23,10 +22,10 @@ import io.reactivex.processors.PublishProcessor;
 import io.reactivex.schedulers.Schedulers;
 import network.tutoria.com.networkdemo.network.GsonUtil;
 import network.tutoria.com.networkdemo.network.RequestBuilder;
+import network.tutoria.com.networkdemo.network.RequestError;
 import network.tutoria.com.networkdemo.network.api.CustomParser;
 import network.tutoria.com.networkdemo.network.api.NetworkRequestProcessor;
 import network.tutoria.com.networkdemo.network.api.NetworkResultHandler;
-import network.tutoria.com.networkdemo.network.other.okhttp.UploadPostBody;
 import okhttp3.Call;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -85,27 +84,42 @@ public class NetworkRequestRetrofitProcessor implements NetworkRequestProcessor 
         return GsonUtil.getGson().fromJson(response, type);
     }
 
+    private void onGetError(final NetworkResultHandler resultHandler, Throwable throwable) {
+        throwable.printStackTrace();
+        if (throwable instanceof RequestError) {
+            resultHandler.onError((RequestError) throwable);
+        } else {
+            resultHandler.onError(new RequestError().setError(throwable));
+        }
+    }
+
+    private <T> T parseResponseBody(@NonNull ResponseBody responseBody, RequestBuilder requestContents, Type type) throws Exception {
+        String resultData = responseBody.string();
+        try {
+            return parseStringToObject(requestContents, resultData, type);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RequestError().setError(e).setRequestResult(resultData);
+        }
+    }
+
     public <T> void startGetRequest(final RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler, final Type type) {
         Observable<ResponseBody> responseBodyObservable = requestService.get(requestContents.getHeaders(), requestContents.getUrl(), requestContents.getRequestParams());
         responseBodyObservable.map(new Function<ResponseBody, T>() {
             @Override
             public T apply(@NonNull ResponseBody responseBody) throws Exception {
-                T result = parseStringToObject(requestContents, responseBody.string(), type);
-                return result;
+                return parseResponseBody(responseBody, requestContents, type);
             }
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<T>() {
                     @Override
                     public void accept(T t) throws Exception {
-                        String s = t.toString();
-                        Log.e("result t", s);
                         resultHandler.onLoadSuccess(t);
                     }
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
-                        throwable.printStackTrace();
-                        resultHandler.onError(throwable);
+                        onGetError(resultHandler, throwable);
                     }
                 });
     }
@@ -115,7 +129,7 @@ public class NetworkRequestRetrofitProcessor implements NetworkRequestProcessor 
         Observable<T> request = requestService.post(requestContents.getHeaders(), requestContents.getUrl(), requestContents.getRequestParams()).map(new Function<ResponseBody, T>() {
             @Override
             public T apply(@NonNull ResponseBody responseBody) throws Exception {
-                return parseStringToObject(requestContents, responseBody.string(), type);
+                return parseResponseBody(responseBody, requestContents, type);
             }
         });
         request.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<T>() {
@@ -126,7 +140,7 @@ public class NetworkRequestRetrofitProcessor implements NetworkRequestProcessor 
         }, new Consumer<Throwable>() {
             @Override
             public void accept(Throwable throwable) throws Exception {
-                resultHandler.onError(throwable);
+                onGetError(resultHandler, throwable);
             }
         });
     }
@@ -154,7 +168,7 @@ public class NetworkRequestRetrofitProcessor implements NetworkRequestProcessor 
         Observable<T> uploadRequest = requestService.uploadFile(requestContents.getHeaders(), requestContents.getUrl(), multiPartBuilder.build().parts()).map(new Function<ResponseBody, T>() {
             @Override
             public T apply(@NonNull ResponseBody responseBody) throws Exception {
-                return parseStringToObject(requestContents, responseBody.string(), type);
+                return parseResponseBody(responseBody, requestContents, type);
             }
         });
         if (fileTotalLength == 0) {
@@ -162,7 +176,7 @@ public class NetworkRequestRetrofitProcessor implements NetworkRequestProcessor 
         }
         final long totalSize = fileTotalLength;
         final PublishProcessor<Long> publishProcessor = PublishProcessor.create();
-        UploadPostBody.ProgressChangedListener progressChangedListener = new UploadPostBody.ProgressChangedListener() {
+        ProgressChangedListener progressChangedListener = new ProgressChangedListener() {
             private long readTotal = 0;
 
             @Override
@@ -198,7 +212,7 @@ public class NetworkRequestRetrofitProcessor implements NetworkRequestProcessor 
         }, new Consumer<Throwable>() {
             @Override
             public void accept(Throwable throwable) throws Exception {
-                resultHandler.onError(throwable);
+                onGetError(resultHandler,throwable);
             }
         });
     }
@@ -241,11 +255,12 @@ public class NetworkRequestRetrofitProcessor implements NetworkRequestProcessor 
         }).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<File>() {
             @Override
             public void accept(File file) throws Exception {
+
             }
         }, new Consumer<Throwable>() {
             @Override
             public void accept(Throwable throwable) throws Exception {
-                resultHandler.onError(throwable);
+                resultHandler.onError(new RequestError().setError(throwable));
             }
         });
         publishProcessor.sample(100, TimeUnit.MILLISECONDS).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<Integer>() {
@@ -256,7 +271,7 @@ public class NetworkRequestRetrofitProcessor implements NetworkRequestProcessor 
         }, new Consumer<Throwable>() {
             @Override
             public void accept(Throwable throwable) throws Exception {
-                resultHandler.onError(throwable);
+                resultHandler.onError(new RequestError().setError(throwable));
             }
         }, new Action() {
             @Override

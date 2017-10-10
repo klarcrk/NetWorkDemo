@@ -1,4 +1,4 @@
-package network.tutoria.com.networkdemo.network.other.okhttp;
+package network.tutoria.com.networkdemo.other.okhttp;
 
 import android.util.Log;
 

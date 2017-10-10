@@ -1,10 +1,13 @@
 package network.tutoria.com.networkdemo;
 
 import java.lang.reflect.Type;
+import java.util.HashMap;
 
-import network.tutoria.com.networkdemo.bean.GanHuoResult;
+import network.tutoria.com.networkdemo.bean.LoginBean;
+import network.tutoria.com.networkdemo.bean.RegisterBean;
 import network.tutoria.com.networkdemo.network.RequestBuilder;
 import network.tutoria.com.networkdemo.network.api.CustomParser;
+import network.tutoria.com.networkdemo.network.api.NetworkResultHandler;
 import network.tutoria.com.networkdemo.network.api.RequestBase;
 
 /**
@@ -14,7 +17,7 @@ import network.tutoria.com.networkdemo.network.api.RequestBase;
  * Licensed under the Apache License, Version 2.0 (the "License");                                              #
  */
 
-public class DemoRequest extends RequestBase<GanHuoResult> {
+public class DemoRequest extends RequestBase {
 
     private String email, password;
 
@@ -22,23 +25,23 @@ public class DemoRequest extends RequestBase<GanHuoResult> {
         this.email = email;
         this.password = password;
         //设置自定义解析
-        setCustomParser(new CustomParser<GanHuoResult>() {
-
-            @Override
-            public GanHuoResult parseResult(Type type, String result) {
-                return null;
-            }
-        });
-    }
-
-    @Override
-    public RequestBuilder getRequestBuilder() {
-        return RequestBuilder.get("http://gank.io/api/data/休息视频/1/1").addParam("email", email).addParam("password", password);
     }
 
     //返回值的类型
-    public Type getResultType() {
-        return GanHuoResult.class;
+    public void doRegister(NetworkResultHandler<RegisterBean> networkResultHandler) {
+        cancelPreRequest();
+        requestBuilder = RequestBuilder.get("http://gank.io/api/data/休息视频/1/1").addParam("regist", email).addParam("password", password).setCustomParser(new CustomParser<RegisterBean>() {
+            @Override
+            public RegisterBean parseResult(Type type, String result) {
+                return null;
+            }
+        }).doRequest(RegisterBean.class, networkResultHandler);
+    }
+
+
+    public void doLogin(HashMap<String, String> params, NetworkResultHandler<LoginBean> networkResultHandler) {
+        cancelPreRequest();
+        requestBuilder = RequestBuilder.get("http://gank.io/api/data/休息视频/1/1").addParams(params).doRequest(LoginBean.class, networkResultHandler);
     }
 
 }

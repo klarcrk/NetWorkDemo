@@ -1,4 +1,4 @@
-package network.tutoria.com.networkdemo.network.other.okhttp;
+package network.tutoria.com.networkdemo.network.retrofit;
 
 /**
  * Created on 2017/10/10 14:16.

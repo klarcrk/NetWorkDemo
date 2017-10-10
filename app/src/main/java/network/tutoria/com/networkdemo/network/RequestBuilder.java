@@ -12,10 +12,9 @@ import java.util.Map;
 import java.util.Set;
 
 import network.tutoria.com.networkdemo.network.api.CustomParser;
-import network.tutoria.com.networkdemo.network.api.HeaderUtil;
 import network.tutoria.com.networkdemo.network.api.NetworkRequestProcessor;
 import network.tutoria.com.networkdemo.network.api.NetworkResultHandler;
-import network.tutoria.com.networkdemo.network.retorfit.NetworkRequestRetrofitProcessor;
+import network.tutoria.com.networkdemo.network.retrofit.NetworkRequestRetrofitProcessor;
 
 /**
  * 包含了所有的请求的数据信息
@@ -194,7 +193,7 @@ public class RequestBuilder {
         return this;
     }
 
-    public <T> void execute(Type type, @NonNull NetworkResultHandler<T> networkResultHandler) {
+    public <T> RequestBuilder doRequest(Type type, @NonNull NetworkResultHandler<T> networkResultHandler) {
         //设置全局请求头
         HeaderUtil.addGlobalHeader(this);
         //执行请求
@@ -213,6 +212,7 @@ public class RequestBuilder {
                 requestProcessor.startUploadRequest(this, networkResultHandler, type);
                 break;
         }
+        return this;
     }
 
 

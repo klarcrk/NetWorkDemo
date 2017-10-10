@@ -1,4 +1,4 @@
-package network.tutoria.com.networkdemo.network.other.okhttp;
+package network.tutoria.com.networkdemo.other.okhttp;
 
 import android.content.Context;
 
@@ -26,9 +26,10 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.processors.PublishProcessor;
 import io.reactivex.schedulers.Schedulers;
 import network.tutoria.com.networkdemo.network.GsonUtil;
+import network.tutoria.com.networkdemo.network.RequestBuilder;
+import network.tutoria.com.networkdemo.network.RequestError;
 import network.tutoria.com.networkdemo.network.api.NetworkRequestProcessor;
 import network.tutoria.com.networkdemo.network.api.NetworkResultHandler;
-import network.tutoria.com.networkdemo.network.RequestBuilder;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.MediaType;
@@ -76,8 +77,13 @@ public class NetworkRequestProcessorOkHttp implements NetworkRequestProcessor {
         Flowable.create(new FlowableOnSubscribe<T>() {
             @Override
             public void subscribe(@NonNull FlowableEmitter<T> e) throws Exception {
-                T result = parseStringToObject(response);
-                e.onNext(result);
+                try {
+                    T result = parseStringToObject(response);
+                    e.onNext(result);
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                    resultHandler.onError(new RequestError().setError(e1).setRequestResult(response));
+                }
                 e.onComplete();
             }
         }, BackpressureStrategy.LATEST).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
@@ -89,7 +95,7 @@ public class NetworkRequestProcessorOkHttp implements NetworkRequestProcessor {
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
-                        resultHandler.onError(throwable);
+                        resultHandler.onError(new RequestError().setError(throwable));
                     }
                 });
     }
@@ -122,12 +128,7 @@ public class NetworkRequestProcessorOkHttp implements NetworkRequestProcessor {
                 Flowable.just(e).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<IOException>() {
                     @Override
                     public void accept(IOException e) throws Exception {
-                        resultHandler.onError(e);
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        resultHandler.onError(throwable);
+                        resultHandler.onError(new RequestError().setError(e));
                     }
                 });
             }
@@ -163,12 +164,7 @@ public class NetworkRequestProcessorOkHttp implements NetworkRequestProcessor {
                 Flowable.just(e).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<IOException>() {
                     @Override
                     public void accept(IOException e) throws Exception {
-                        resultHandler.onError(e);
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        resultHandler.onError(throwable);
+                        resultHandler.onError(new RequestError().setError(e));
                     }
                 });
             }
@@ -210,7 +206,7 @@ public class NetworkRequestProcessorOkHttp implements NetworkRequestProcessor {
         }
         final long totalSize = fileTotalLength;
         final PublishProcessor<Long> publishProcessor = PublishProcessor.create();
-        UploadPostBody.ProgressChangedListener progressChangedListener = new UploadPostBody.ProgressChangedListener() {
+        ProgressChangedListener progressChangedListener = new ProgressChangedListener() {
             private long readTotal = 0;
 
             @Override
@@ -250,12 +246,12 @@ public class NetworkRequestProcessorOkHttp implements NetworkRequestProcessor {
                 Flowable.just(e).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<IOException>() {
                     @Override
                     public void accept(IOException e) throws Exception {
-                        resultHandler.onError(e);
+                        resultHandler.onError(new RequestError().setError(e));
                     }
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
-                        resultHandler.onError(throwable);
+                        resultHandler.onError(new RequestError().setError(throwable));
                     }
                 });
             }
@@ -286,12 +282,12 @@ public class NetworkRequestProcessorOkHttp implements NetworkRequestProcessor {
                 Flowable.just(e).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<IOException>() {
                     @Override
                     public void accept(IOException e) throws Exception {
-                        resultHandler.onError(e);
+                        resultHandler.onError(new RequestError().setError(e));
                     }
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
-                        resultHandler.onError(throwable);
+                        resultHandler.onError(new RequestError().setError(throwable));
                     }
                 });
             }
@@ -335,7 +331,7 @@ public class NetworkRequestProcessorOkHttp implements NetworkRequestProcessor {
         }, new Consumer<Throwable>() {
             @Override
             public void accept(Throwable throwable) throws Exception {
-                resultHandler.onError(throwable);
+                resultHandler.onError(new RequestError().setError(throwable));
             }
         }, new Action() {
             @Override

@@ -9,9 +9,9 @@ import java.util.List;
  * Licensed under the Apache License, Version 2.0 (the "License");                                              #
  */
 
-public class GanHuoResult {
+public class LoginBean {
     private boolean error;
-    private List<GanHuo> results;
+    private List<RegisterBean> results;
 
     public boolean isError() {
         return error;
@@ -21,11 +21,11 @@ public class GanHuoResult {
         this.error = error;
     }
 
-    public List<GanHuo> getResults() {
+    public List<RegisterBean> getResults() {
         return results;
     }
 
-    public void setResults(List<GanHuo> results) {
+    public void setResults(List<RegisterBean> results) {
         this.results = results;
     }
 }

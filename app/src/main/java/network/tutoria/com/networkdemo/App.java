@@ -2,7 +2,7 @@ package network.tutoria.com.networkdemo;
 
 import android.app.Application;
 
-import network.tutoria.com.networkdemo.network.retorfit.NetworkRequestRetrofitProcessor;
+import network.tutoria.com.networkdemo.network.retrofit.NetworkRequestRetrofitProcessor;
 
 /**
  * Created on 2017/9/28 17:15.

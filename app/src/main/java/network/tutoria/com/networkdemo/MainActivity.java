@@ -14,8 +14,10 @@ import android.widget.Toast;
 import java.io.File;
 import java.util.HashMap;
 
-import network.tutoria.com.networkdemo.bean.GanHuoResult;
+import network.tutoria.com.networkdemo.bean.LoginBean;
+import network.tutoria.com.networkdemo.bean.RegisterBean;
 import network.tutoria.com.networkdemo.network.RequestBuilder;
+import network.tutoria.com.networkdemo.network.RequestError;
 import network.tutoria.com.networkdemo.network.api.NetworkResultHandler;
 
 public class MainActivity extends AppCompatActivity {
@@ -31,20 +33,31 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                new DemoRequest("xxx@qq.com", "123456").setResultHandler(new NetworkResultHandler<GanHuoResult>() {
+                DemoRequest demoRequest = new DemoRequest("xx", "xxx");
+                demoRequest.doRegister(new NetworkResultHandler<RegisterBean>() {
                     @Override
-                    public void onError(Throwable error) {
+                    public void onError(RequestError error) {
                         super.onError(error);
-                        textView.setText(error.getMessage());
                     }
 
                     @Override
-                    public void onLoadSuccess(GanHuoResult result) {
+                    public void onLoadSuccess(RegisterBean result) {
                         super.onLoadSuccess(result);
-                        textView.setText(result.toString());
                     }
-                }).execute();
+                });
+
+                HashMap<String, String> params =new HashMap<String, String>();
+                demoRequest.doLogin(params,new NetworkResultHandler<LoginBean>(){
+                    @Override
+                    public void onLoadSuccess(LoginBean result) {
+                        super.onLoadSuccess(result);
+                    }
+
+                    @Override
+                    public void onError(RequestError error) {
+                        super.onError(error);
+                    }
+                });
 
             }
         });
@@ -54,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
         File storageDirectory = Environment.getExternalStorageDirectory();
         String url = "http://dl-cdn.coolapkmarket.com/down/apk_file/2017/0818/com.coolapk.market-7.9.7-1708181.apk?_upt=5459fcd61506766821";
         File targetFile = new File(storageDirectory, "kuku.apk");
-        RequestBuilder.download(url, targetFile).execute(null, new NetworkResultHandler<String>() {
+        RequestBuilder.download(url, targetFile).doRequest(null, new NetworkResultHandler<String>() {
             @Override
             public void onDownloadSuccess(File downloadFile) {
                 textView.setText("下载进度完成");
@@ -67,8 +80,8 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onError(Throwable error) {
-                textView.setText(error.getMessage());
+            public void onError(RequestError error) {
+                textView.setText(error.getError().getMessage());
             }
         });
     }
@@ -80,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
         uploadFilePart.put("fileKey", uploadFile);
         RequestBuilder.upload(url, uploadFilePart)
                 //.uploadFileMediaType("application/octet-stream")//标识上传文件的类型
-                .execute(String.class, new NetworkResultHandler<String>() {
+                .doRequest(String.class, new NetworkResultHandler<String>() {
                     @Override
                     public void onGetUploadProgress(int progress) {
                         textView.setText(String.format("上传进度%d", progress));
@@ -92,8 +105,8 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onError(Throwable error) {
-                        textView.setText(error.getMessage());
+                    public void onError(RequestError error) {
+                        textView.setText(error.getError().getMessage());
                     }
                 });
     }

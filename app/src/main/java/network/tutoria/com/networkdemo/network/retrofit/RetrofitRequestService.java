@@ -1,4 +1,4 @@
-package network.tutoria.com.networkdemo.network.retorfit;
+package network.tutoria.com.networkdemo.network.retrofit;
 
 import java.util.List;
 import java.util.Map;

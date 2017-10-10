@@ -1,6 +1,4 @@
-package network.tutoria.com.networkdemo.network.api;
-
-import network.tutoria.com.networkdemo.network.RequestBuilder;
+package network.tutoria.com.networkdemo.network;
 
 /**
  * Created on 2017/10/10 13:55.

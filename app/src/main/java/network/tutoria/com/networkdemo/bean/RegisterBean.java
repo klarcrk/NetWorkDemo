@@ -7,7 +7,7 @@ package network.tutoria.com.networkdemo.bean;
  * Licensed under the Apache License, Version 2.0 (the "License");                                              #
  */
 
-public class GanHuo {
+public class RegisterBean {
 
     /**
      * who : 有时放纵
