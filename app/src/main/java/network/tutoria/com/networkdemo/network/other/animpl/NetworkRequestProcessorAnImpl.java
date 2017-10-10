@@ -1,4 +1,4 @@
-package network.tutoria.com.networkdemo.network.animpl;
+package network.tutoria.com.networkdemo.network.other.animpl;
 
 import android.content.Context;
 

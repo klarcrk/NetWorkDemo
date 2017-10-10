@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import network.tutoria.com.networkdemo.network.api.CustomParser;
+import network.tutoria.com.networkdemo.network.api.HeaderUtil;
 import network.tutoria.com.networkdemo.network.api.NetworkRequestProcessor;
 import network.tutoria.com.networkdemo.network.api.NetworkResultHandler;
 import network.tutoria.com.networkdemo.network.retorfit.NetworkRequestRetrofitProcessor;
@@ -46,20 +48,6 @@ public class RequestBuilder {
 
     }
 
-    private String url; //url 肯定不能为空
-
-    private HashMap<String, File> filePart;//上传文件的路径  METHOD_UPLOAD时才有用
-
-    private String uploadFileMediaType = "application/octet-stream"; //上传文件的类型 image/*
-
-    private final int requestMethod;
-
-    private HashMap<String, String> requestParams = new HashMap<>();
-    private HashMap<String, String> headers = new HashMap<>();
-
-
-    private File downloadTargetFile;
-
     //get请求
     public static RequestBuilder get(@NonNull String url) {
         return new RequestBuilder(METHOD_GET).url(url);
@@ -75,6 +63,24 @@ public class RequestBuilder {
         return new RequestBuilder(METHOD_UPLOAD_FILE).url(url).uploadFilePart(filePart);
     }
 
+    public static RequestBuilder download(@NonNull String url, File downloadTargetFile) {
+        return new RequestBuilder(METHOD_DOWNLOAD_FILE).url(url).downloadFile(downloadTargetFile);
+    }
+
+    private String url; //url 肯定不能为空
+
+    private HashMap<String, File> filePart;//上传文件的路径  METHOD_UPLOAD时才有用
+
+    private String uploadFileMediaType = "application/octet-stream"; //上传文件的类型 image/*
+
+    private final int requestMethod;
+
+    private HashMap<String, String> requestParams = new HashMap<>();
+    private HashMap<String, String> headers = new HashMap<>();
+
+    private File downloadTargetFile;
+
+
     //文件类型 text/plain
     public RequestBuilder uploadFileMediaType(String fileMediaType) {
         this.uploadFileMediaType = fileMediaType;
@@ -83,10 +89,6 @@ public class RequestBuilder {
 
     public String getUploadFileMediaType() {
         return uploadFileMediaType;
-    }
-
-    public static RequestBuilder download(@NonNull String url, File downloadTargetFile) {
-        return new RequestBuilder(METHOD_DOWNLOAD_FILE).url(url).downloadFile(downloadTargetFile);
     }
 
     private RequestBuilder downloadFile(@NonNull File downloadTargetFile) {
@@ -180,9 +182,22 @@ public class RequestBuilder {
         return headers;
     }
 
+    //自定义方法解析请求结果
+    private CustomParser customParser;
 
+    public CustomParser getCustomParser() {
+        return customParser;
+    }
+
+    public RequestBuilder setCustomParser(CustomParser customParser) {
+        this.customParser = customParser;
+        return this;
+    }
 
     public <T> void execute(Type type, @NonNull NetworkResultHandler<T> networkResultHandler) {
+        //设置全局请求头
+        HeaderUtil.addGlobalHeader(this);
+        //执行请求
         NetworkRequestProcessor requestProcessor = NetworkRequestRetrofitProcessor.getInstance();
         switch (requestMethod) {
             case METHOD_GET:

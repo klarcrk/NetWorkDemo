@@ -1,4 +1,4 @@
-package network.tutoria.com.networkdemo.network.okhttp;
+package network.tutoria.com.networkdemo.network.other.okhttp;
 
 import android.util.Log;
 
@@ -23,7 +23,7 @@ public class UploadPostBody extends RequestBody {
 
     private final MediaType mediaType;
     private final File uploadFile;
-    private ProgressChangedListener mListener;
+    private ProgressChangedListener listener;
 
     public UploadPostBody(MediaType mediaType, File uploadFile) {
         this.mediaType = mediaType;
@@ -31,7 +31,7 @@ public class UploadPostBody extends RequestBody {
     }
 
     public void setListener(ProgressChangedListener listener) {
-        this.mListener = listener;
+        this.listener = listener;
     }
 
     @Override
@@ -55,19 +55,13 @@ public class UploadPostBody extends RequestBody {
             for (long readCount; (readCount = source.read(buffer, 2048)) != -1; ) {
                 sink.write(buffer, readCount);
                 Log.d("tag", "source size: " + contentLength() + " remaining bytes: " + (remaining -= readCount));
-                if (mListener != null) {
-                    mListener.onProgressChanged(contentLength(), remaining, contentLength() - remaining, readCount);
+                if (listener != null) {
+                    listener.onProgressChanged(contentLength(), remaining, contentLength() - remaining, readCount);
                 }
             }
             sink.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public interface ProgressChangedListener {
-
-        //不是主线程
-        void onProgressChanged(long byteTotalCount, long remainByteCount, long readCount, long countReadThisTime);
     }
 }

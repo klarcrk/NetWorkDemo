@@ -1,4 +1,4 @@
-package network.tutoria.com.networkdemo.network.okhttp;
+package network.tutoria.com.networkdemo.network.other.okhttp;
 
 import android.content.Context;
 

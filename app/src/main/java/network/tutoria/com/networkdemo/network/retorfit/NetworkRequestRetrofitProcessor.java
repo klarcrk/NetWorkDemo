@@ -3,8 +3,6 @@ package network.tutoria.com.networkdemo.network.retorfit;
 import android.content.Context;
 import android.util.Log;
 
-import com.google.gson.reflect.TypeToken;
-
 import org.junit.Assert;
 
 import java.io.File;
@@ -25,9 +23,10 @@ import io.reactivex.processors.PublishProcessor;
 import io.reactivex.schedulers.Schedulers;
 import network.tutoria.com.networkdemo.network.GsonUtil;
 import network.tutoria.com.networkdemo.network.RequestBuilder;
+import network.tutoria.com.networkdemo.network.api.CustomParser;
 import network.tutoria.com.networkdemo.network.api.NetworkRequestProcessor;
 import network.tutoria.com.networkdemo.network.api.NetworkResultHandler;
-import network.tutoria.com.networkdemo.network.okhttp.UploadPostBody;
+import network.tutoria.com.networkdemo.network.other.okhttp.UploadPostBody;
 import okhttp3.Call;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -78,17 +77,20 @@ public class NetworkRequestRetrofitProcessor implements NetworkRequestProcessor 
         requestService = retrofit.create(RetrofitRequestService.class);
     }
 
-    private <T> T parseStringToObject(String response, Type type) throws Exception {
+    private <T> T parseStringToObject(RequestBuilder requestContents, String response, Type type) throws Exception {
+        CustomParser<T> customParser = requestContents.getCustomParser();
+        if (customParser != null) {
+            return customParser.parseResult(type, response);
+        }
         return GsonUtil.getGson().fromJson(response, type);
     }
 
-    public <T> void startGetRequest(RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler, final Type type) {
-        Type type1 = new TypeToken<T>() { }.getType();
+    public <T> void startGetRequest(final RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler, final Type type) {
         Observable<ResponseBody> responseBodyObservable = requestService.get(requestContents.getHeaders(), requestContents.getUrl(), requestContents.getRequestParams());
         responseBodyObservable.map(new Function<ResponseBody, T>() {
             @Override
             public T apply(@NonNull ResponseBody responseBody) throws Exception {
-                T result = parseStringToObject(responseBody.string(), type);
+                T result = parseStringToObject(requestContents, responseBody.string(), type);
                 return result;
             }
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
@@ -109,11 +111,11 @@ public class NetworkRequestRetrofitProcessor implements NetworkRequestProcessor 
     }
 
     @Override
-    public <T> void startPostRequest(RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler, final Type type) {
+    public <T> void startPostRequest(final RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler, final Type type) {
         Observable<T> request = requestService.post(requestContents.getHeaders(), requestContents.getUrl(), requestContents.getRequestParams()).map(new Function<ResponseBody, T>() {
             @Override
             public T apply(@NonNull ResponseBody responseBody) throws Exception {
-                return parseStringToObject(responseBody.string(), type);
+                return parseStringToObject(requestContents, responseBody.string(), type);
             }
         });
         request.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<T>() {
@@ -130,7 +132,7 @@ public class NetworkRequestRetrofitProcessor implements NetworkRequestProcessor 
     }
 
     @Override
-    public <T> void startUploadRequest(RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler, final Type type) {
+    public <T> void startUploadRequest(final RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler, final Type type) {
         MultipartBody.Builder multiPartBuilder = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM);
         HashMap<String, String> requestParams = requestContents.getRequestParams();
@@ -152,7 +154,7 @@ public class NetworkRequestRetrofitProcessor implements NetworkRequestProcessor 
         Observable<T> uploadRequest = requestService.uploadFile(requestContents.getHeaders(), requestContents.getUrl(), multiPartBuilder.build().parts()).map(new Function<ResponseBody, T>() {
             @Override
             public T apply(@NonNull ResponseBody responseBody) throws Exception {
-                return parseStringToObject(responseBody.string(), type);
+                return parseStringToObject(requestContents, responseBody.string(), type);
             }
         });
         if (fileTotalLength == 0) {
