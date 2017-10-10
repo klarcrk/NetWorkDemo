@@ -18,6 +18,7 @@ import java.util.HashMap;
 
 import network.tutoria.com.networkdemo.network.GsonUtil;
 import network.tutoria.com.networkdemo.network.RequestBuilder;
+import network.tutoria.com.networkdemo.network.RequestError;
 import network.tutoria.com.networkdemo.network.api.NetworkRequestProcessor;
 import network.tutoria.com.networkdemo.network.api.NetworkResultHandler;
 
@@ -60,7 +61,7 @@ public class NetworkRequestProcessorAnImpl implements NetworkRequestProcessor {
 
             @Override
             public void onError(ANError anError) {
-                resultHandler.onError(anError);
+                resultHandler.onError(new RequestError().setError(anError));
             }
         });
     }
@@ -81,7 +82,7 @@ public class NetworkRequestProcessorAnImpl implements NetworkRequestProcessor {
 
             @Override
             public void onError(ANError anError) {
-                resultHandler.onError(anError);
+                resultHandler.onError(new RequestError().setError(anError));
             }
         });
     }
@@ -113,7 +114,7 @@ public class NetworkRequestProcessorAnImpl implements NetworkRequestProcessor {
 
             @Override
             public void onError(ANError anError) {
-                resultHandler.onError(anError);
+                resultHandler.onError(new RequestError().setError(anError));
             }
         });
     }
@@ -125,7 +126,7 @@ public class NetworkRequestProcessorAnImpl implements NetworkRequestProcessor {
             resultHandler.onLoadSuccess(result);
         } catch (Exception e) {
             e.printStackTrace();
-            resultHandler.onError(e);
+            resultHandler.onError(new RequestError().setError(e).setRequestResult(response));
         }
     }
 
@@ -161,7 +162,7 @@ public class NetworkRequestProcessorAnImpl implements NetworkRequestProcessor {
                     @Override
                     public void onError(ANError error) {
                         // handle error
-                        resultHandler.onError(error);
+                        resultHandler.onError(new RequestError().setError(error));
                     }
                 });
     }
