@@ -24,7 +24,6 @@ public class DemoRequest extends RequestBase {
     public DemoRequest(String email, String password) {
         this.email = email;
         this.password = password;
-        //设置自定义解析
     }
 
     //返回值的类型
