@@ -4,7 +4,6 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 
 import network.tutoria.com.networkdemo.bean.LoginBean;
-import network.tutoria.com.networkdemo.bean.RegisterBean;
 import network.tutoria.com.networkdemo.network.RequestBuilder;
 import network.tutoria.com.networkdemo.network.api.CustomParser;
 import network.tutoria.com.networkdemo.network.api.NetworkResultHandler;
@@ -26,20 +25,23 @@ public class DemoRequest extends RequestBase {
         this.password = password;
     }
 
-    public void doRegister(NetworkResultHandler<RegisterBean> networkResultHandler) {
+    public void doRegister(NetworkResultHandler<LoginBean> networkResultHandler) {
         cancelPreRequest();
-        requestBuilder = RequestBuilder.get("http://gank.io/api/data/休息视频/1/1").addParam("regist", email).addParam("password", password).setCustomParser(new CustomParser<RegisterBean>() {
-            @Override
-            public RegisterBean parseResult(Type type, String result) {
-                return null;
-            }
-        }).doRequest(RegisterBean.class, networkResultHandler);
+        requestBuilder = RequestBuilder.get("http://gank.io/api/data/休息视频/1/1").addParam("regist", email).addParam("password", password).doRequest(LoginBean.class, networkResultHandler);
     }
 
 
     public void doLogin(HashMap<String, String> params, NetworkResultHandler<LoginBean> networkResultHandler) {
         cancelPreRequest();
-        requestBuilder = RequestBuilder.post("http://gank.io/api/data/休息视频/1/1").addParams(params).doRequest(LoginBean.class, networkResultHandler);
+        requestBuilder = RequestBuilder.post("http://gank.io/api/data/休息视频/1/1").addParams(params)
+                .setCustomParser(new CustomParser<LoginBean>() {
+                    @Override
+                    public LoginBean parseResult(Type type, String result) {
+                        //自定义解析结果
+                        return null;
+                    }
+                })
+                .doRequest(LoginBean.class, networkResultHandler);
     }
 
 }

@@ -15,7 +15,6 @@ import java.io.File;
 import java.util.HashMap;
 
 import network.tutoria.com.networkdemo.bean.LoginBean;
-import network.tutoria.com.networkdemo.bean.RegisterBean;
 import network.tutoria.com.networkdemo.network.RequestBuilder;
 import network.tutoria.com.networkdemo.network.RequestError;
 import network.tutoria.com.networkdemo.network.api.NetworkResultHandler;
@@ -34,15 +33,17 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 DemoRequest demoRequest = new DemoRequest("xx", "xxx");
-                demoRequest.doRegister(new NetworkResultHandler<RegisterBean>() {
+                demoRequest.doRegister(new NetworkResultHandler<LoginBean>() {
                     @Override
                     public void onError(RequestError error) {
                         super.onError(error);
+                        textView.setText(error.getError().getMessage());
                     }
 
                     @Override
-                    public void onLoadSuccess(RegisterBean result) {
+                    public void onLoadSuccess(LoginBean result) {
                         super.onLoadSuccess(result);
+                        textView.setText(result.toString());
                     }
                 });
 

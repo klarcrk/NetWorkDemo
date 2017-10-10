@@ -111,4 +111,21 @@ public class RegisterBean {
     public void setHeight(int height) {
         this.height = height;
     }
+
+
+    @Override
+    public String toString() {
+        return "RegisterBean{" +
+                "who='" + who + '\'' +
+                ", publishedAt='" + publishedAt + '\'' +
+                ", desc='" + desc + '\'' +
+                ", type='" + type + '\'' +
+                ", url='" + url + '\'' +
+                ", used=" + used +
+                ", objectId='" + objectId + '\'' +
+                ", createdAt='" + createdAt + '\'' +
+                ", updatedAt='" + updatedAt + '\'' +
+                ", height=" + height +
+                '}';
+    }
 }

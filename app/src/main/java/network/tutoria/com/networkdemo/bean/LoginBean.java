@@ -28,4 +28,13 @@ public class LoginBean {
     public void setResults(List<RegisterBean> results) {
         this.results = results;
     }
+
+
+    @Override
+    public String toString() {
+        return "LoginBean{" +
+                "error=" + error +
+                ", results=" + results +
+                '}';
+    }
 }
