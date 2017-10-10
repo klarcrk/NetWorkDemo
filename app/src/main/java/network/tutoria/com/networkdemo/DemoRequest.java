@@ -26,7 +26,6 @@ public class DemoRequest extends RequestBase {
         this.password = password;
     }
 
-    //返回值的类型
     public void doRegister(NetworkResultHandler<RegisterBean> networkResultHandler) {
         cancelPreRequest();
         requestBuilder = RequestBuilder.get("http://gank.io/api/data/休息视频/1/1").addParam("regist", email).addParam("password", password).setCustomParser(new CustomParser<RegisterBean>() {
@@ -40,7 +39,7 @@ public class DemoRequest extends RequestBase {
 
     public void doLogin(HashMap<String, String> params, NetworkResultHandler<LoginBean> networkResultHandler) {
         cancelPreRequest();
-        requestBuilder = RequestBuilder.get("http://gank.io/api/data/休息视频/1/1").addParams(params).doRequest(LoginBean.class, networkResultHandler);
+        requestBuilder = RequestBuilder.post("http://gank.io/api/data/休息视频/1/1").addParams(params).doRequest(LoginBean.class, networkResultHandler);
     }
 
 }

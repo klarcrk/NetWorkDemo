@@ -31,7 +31,7 @@ public interface RetrofitRequestService {
 
     @FormUrlEncoded
     @POST
-     Observable<ResponseBody> post(@HeaderMap Map<String, String> headers, @Url String url, @FieldMap Map<String, String> queryParams);
+    Observable<ResponseBody> post(@HeaderMap Map<String, String> headers, @Url String url, @FieldMap Map<String, String> queryParams);
 
 
     @FormUrlEncoded
@@ -45,6 +45,6 @@ public interface RetrofitRequestService {
 
     @Multipart
     @POST
-    <T> Observable<ResponseBody> uploadFile(@HeaderMap Map<String, String> headers, @Url String url, @Part List<MultipartBody.Part> parts);
+    Observable<ResponseBody> uploadFile(@HeaderMap Map<String, String> headers, @Url String url, @Part List<MultipartBody.Part> parts);
 
 }
