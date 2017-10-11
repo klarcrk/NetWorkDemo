@@ -67,7 +67,7 @@ public class RequestBuilder {
 
     //post请求
     public static RequestBuilder post(@NonNull String url) {
-        return new RequestBuilder(METHOD_GET).url(url);
+        return new RequestBuilder(METHOD_POST).url(url);
     }
 
     //文件上传
