@@ -172,7 +172,7 @@ public class NetworkRequestRetrofitProcessor implements NetworkRequestProcessor 
             multiPartBuilder.addFormDataPart(requestParamKey, requestParams.get(requestParamKey));
         }
         HashMap<String, File> filePart = requestContents.getFilePart();
-        Set<String> fileParamKeys = requestParams.keySet();
+        Set<String> fileParamKeys = filePart.keySet();
         ArrayList<UploadPostBody> uploadPostBodies = new ArrayList<>();
         long fileTotalLength = 0;
         for (String fileParamKey : fileParamKeys) {
