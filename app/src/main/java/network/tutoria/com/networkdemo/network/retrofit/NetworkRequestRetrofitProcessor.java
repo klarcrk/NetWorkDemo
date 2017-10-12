@@ -84,7 +84,8 @@ public class NetworkRequestRetrofitProcessor implements NetworkRequestProcessor 
         return GsonUtil.getGson().fromJson(response, type);
     }
 
-    private void onGetError(final NetworkResultHandler resultHandler, Throwable throwable) {
+    private void onGetError(final NetworkResultHandler resultHandler, Throwable throwable, RequestBuilder requestContents) {
+        requestContents.setDone(true);
         throwable.printStackTrace();
         if (throwable instanceof RequestError) {
             resultHandler.onError((RequestError) throwable);
@@ -119,6 +120,7 @@ public class NetworkRequestRetrofitProcessor implements NetworkRequestProcessor 
                 .subscribe(new Consumer<T>() {
                     @Override
                     public void accept(T t) throws Exception {
+                        requestContents.setDone(true);
                         resultHandler.onLoadSuccess(t);
                         //结果返回了 删除管理的请求
                         RequestManager.get().removeTag(requestContents.getTag());
@@ -126,7 +128,8 @@ public class NetworkRequestRetrofitProcessor implements NetworkRequestProcessor 
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
-                        onGetError(resultHandler, throwable);
+                        requestContents.setDone(true);
+                        onGetError(resultHandler, throwable, requestContents);
                         //结果返回了 删除管理的请求
                         RequestManager.get().removeTag(requestContents.getTag());
                     }
@@ -146,6 +149,7 @@ public class NetworkRequestRetrofitProcessor implements NetworkRequestProcessor 
         Disposable disposable = request.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<T>() {
             @Override
             public void accept(T t) throws Exception {
+                requestContents.setDone(true);
                 resultHandler.onLoadSuccess(t);
                 //结果返回了 删除管理的请求
                 RequestManager.get().removeTag(requestContents.getTag());
@@ -153,7 +157,8 @@ public class NetworkRequestRetrofitProcessor implements NetworkRequestProcessor 
         }, new Consumer<Throwable>() {
             @Override
             public void accept(Throwable throwable) throws Exception {
-                onGetError(resultHandler, throwable);
+                requestContents.setDone(true);
+                onGetError(resultHandler, throwable, requestContents);
                 //结果返回了 删除管理的请求
                 RequestManager.get().removeTag(requestContents.getTag());
             }
@@ -224,6 +229,7 @@ public class NetworkRequestRetrofitProcessor implements NetworkRequestProcessor 
         Disposable disposable = uploadRequest.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<T>() {
             @Override
             public void accept(T t) throws Exception {
+                requestContents.setDone(true);
                 resultHandler.onLoadSuccess(t);
                 //结果返回了 删除管理的请求
                 RequestManager.get().removeTag(requestContents.getTag());
@@ -231,7 +237,8 @@ public class NetworkRequestRetrofitProcessor implements NetworkRequestProcessor 
         }, new Consumer<Throwable>() {
             @Override
             public void accept(Throwable throwable) throws Exception {
-                onGetError(resultHandler, throwable);
+                requestContents.setDone(true);
+                onGetError(resultHandler, throwable, requestContents);
                 //结果返回了 删除管理的请求
                 RequestManager.get().removeTag(requestContents.getTag());
             }
@@ -284,7 +291,7 @@ public class NetworkRequestRetrofitProcessor implements NetworkRequestProcessor 
         }, new Consumer<Throwable>() {
             @Override
             public void accept(Throwable throwable) throws Exception {
-                resultHandler.onError(new RequestError().setError(throwable));
+                onGetError(resultHandler, throwable, requestContents);
                 //结果返回了 删除管理的请求
                 RequestManager.get().removeTag(requestContents.getTag());
             }
@@ -299,7 +306,7 @@ public class NetworkRequestRetrofitProcessor implements NetworkRequestProcessor 
         }, new Consumer<Throwable>() {
             @Override
             public void accept(Throwable throwable) throws Exception {
-                resultHandler.onError(new RequestError().setError(throwable));
+                onGetError(resultHandler, throwable, requestContents);
             }
         }, new Action() {
             @Override

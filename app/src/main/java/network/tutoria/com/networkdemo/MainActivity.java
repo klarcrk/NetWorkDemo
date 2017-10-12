@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 DemoRequest demoRequest = new DemoRequest("xx", "xxx");
-                demoRequest.doRegister(new NetworkResultHandler<LoginBean>() {
+                demoRequest.doRegister(new NetworkResultHandler<Object>() {
                     @Override
                     public void onError(RequestError error) {
                         super.onError(error);
@@ -41,14 +41,14 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onLoadSuccess(LoginBean result) {
+                    public void onLoadSuccess(Object result) {
                         super.onLoadSuccess(result);
                         textView.setText(result.toString());
                     }
                 });
 
-                HashMap<String, String> params =new HashMap<String, String>();
-                demoRequest.doLogin(params,new NetworkResultHandler<LoginBean>(){
+                HashMap<String, String> params = new HashMap<String, String>();
+                demoRequest.doLogin(params, new NetworkResultHandler<LoginBean>() {
                     @Override
                     public void onLoadSuccess(LoginBean result) {
                         super.onLoadSuccess(result);

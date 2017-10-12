@@ -25,9 +25,13 @@ public class DemoRequest extends RequestBase {
         this.password = password;
     }
 
+    /**
+     * @param networkResultHandler
+     */
     public void doRegister(NetworkResultHandler<Object> networkResultHandler) {
-        cancelPreRequest();
-        RequestBuilder requestBuilder = RequestBuilder.get("http://gank.io/api/data/休息视频/1/1").addParam("regist", email).addParam("password", password).setCustomParser(new CustomParser() {
+        String url = "http://gank.io/api/data/休息视频/1/1";
+        cancelPreRequest(url);
+        RequestBuilder requestBuilder = RequestBuilder.get(url).addParam("regist", email).addParam("password", password).setCustomParser(new CustomParser() {
             @Override
             public Object parseResult(Type type, String result) {
                 return null;
@@ -37,16 +41,14 @@ public class DemoRequest extends RequestBase {
 
 
     public void doLogin(HashMap<String, String> params, NetworkResultHandler<LoginBean> networkResultHandler) {
-        cancelPreRequest();
-        requestBuilder = RequestBuilder.post("http://gank.io/api/data/休息视频/1/1").addParams(params)
+        RequestBuilder requestBuilder = RequestBuilder.post("http://gank.io/api/data/休息视频/1/1").addParams(params)
                 .setCustomParser(new CustomParser<LoginBean>() {
                     @Override
                     public LoginBean parseResult(Type type, String result) {
                         //自定义解析结果
                         return null;
                     }
-                })
-                .doRequest(LoginBean.class, networkResultHandler);
+                }).doRequest(LoginBean.class, networkResultHandler);
     }
 
 }

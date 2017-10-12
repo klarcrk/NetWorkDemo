@@ -69,5 +69,4 @@ public class RequestManager {
         cachedRequest.clear();
     }
 
-
 }

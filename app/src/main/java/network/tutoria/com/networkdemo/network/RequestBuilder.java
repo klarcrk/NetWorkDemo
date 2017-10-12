@@ -79,6 +79,9 @@ public class RequestBuilder {
         return new RequestBuilder(METHOD_DOWNLOAD_FILE).url(url).downloadFile(downloadTargetFile);
     }
 
+    //请求是否已经完成了 请求完成后应该设置为true
+    private boolean isDone = false;
+
     private boolean parsableFlag = true;
 
     /*
@@ -90,6 +93,14 @@ public class RequestBuilder {
 
     public boolean isParsableFlag() {
         return parsableFlag;
+    }
+
+    public boolean isDone() {
+        return isDone;
+    }
+
+    public void setDone(boolean done) {
+        isDone = done;
     }
 
     private String url; //url 肯定不能为空
