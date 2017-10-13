@@ -9,7 +9,13 @@ import java.util.HashSet;
  * Created on 2017/10/13 14:43.
  * Project NetWorkDemo
  * Copyright (c) 2017 zzkko Inc. All rights reserved.
- * Licensed under the Apache License, Version 2.0 (the "License");                                              #
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * <p>
+ * <p>
+ * #
+ * 用来管理请求的fragment
+ * 与寄主有相同的生命周期
+ * onDestroy时取消所有请求
  */
 
 public class RequestManagerFragment extends Fragment {
