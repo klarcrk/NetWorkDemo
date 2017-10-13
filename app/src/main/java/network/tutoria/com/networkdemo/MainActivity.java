@@ -6,6 +6,8 @@ import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.PermissionChecker;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -13,13 +15,12 @@ import android.widget.Toast;
 import java.io.File;
 import java.util.HashMap;
 
-import network.tutoria.com.networkdemo.base.BaseActivity;
 import network.tutoria.com.networkdemo.bean.LoginBean;
 import network.tutoria.com.networkdemo.network.RequestBuilder;
 import network.tutoria.com.networkdemo.network.RequestError;
 import network.tutoria.com.networkdemo.network.api.NetworkResultHandler;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,5 +128,17 @@ public class MainActivity extends BaseActivity {
 
     private void showToast(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.i("tag", "activity被onStop了");
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.i("tag", "activity被干掉了");
+        super.onDestroy();
     }
 }
