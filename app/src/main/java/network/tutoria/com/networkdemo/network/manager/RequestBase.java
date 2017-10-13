@@ -1,4 +1,4 @@
-package network.tutoria.com.networkdemo.network.manage;
+package network.tutoria.com.networkdemo.network.manager;
 
 import android.app.Fragment;
 import android.app.FragmentManager;

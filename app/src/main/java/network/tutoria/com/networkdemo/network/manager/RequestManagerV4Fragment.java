@@ -1,6 +1,5 @@
-package network.tutoria.com.networkdemo.network.manage;
+package network.tutoria.com.networkdemo.network.manager;
 
-import android.app.Fragment;
 import android.util.Log;
 
 import java.util.HashSet;
@@ -18,7 +17,7 @@ import java.util.HashSet;
  * onDestroy时取消所有请求
  */
 
-public class RequestManagerFragment extends Fragment {
+public class RequestManagerV4Fragment extends android.support.v4.app.Fragment {
 
     private HashSet<RequestBase> cachedRequestBased = new HashSet<>();
 

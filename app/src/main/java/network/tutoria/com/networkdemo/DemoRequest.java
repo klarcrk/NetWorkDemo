@@ -10,7 +10,7 @@ import network.tutoria.com.networkdemo.bean.LoginBean;
 import network.tutoria.com.networkdemo.network.RequestBuilder;
 import network.tutoria.com.networkdemo.network.api.CustomParser;
 import network.tutoria.com.networkdemo.network.api.NetworkResultHandler;
-import network.tutoria.com.networkdemo.network.manage.RequestBase;
+import network.tutoria.com.networkdemo.network.manager.RequestBase;
 
 /**
  * 继承RequestBase
