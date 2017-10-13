@@ -13,15 +13,13 @@ import android.widget.Toast;
 import java.io.File;
 import java.util.HashMap;
 
-import network.tutoria.com.networkdemo.bean.LoginBean;
 import network.tutoria.com.networkdemo.base.BaseActivity;
+import network.tutoria.com.networkdemo.bean.LoginBean;
 import network.tutoria.com.networkdemo.network.RequestBuilder;
 import network.tutoria.com.networkdemo.network.RequestError;
 import network.tutoria.com.networkdemo.network.api.NetworkResultHandler;
 
 public class MainActivity extends BaseActivity {
-
-    DemoRequest demoRequest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +28,7 @@ public class MainActivity extends BaseActivity {
         if (PermissionChecker.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PermissionChecker.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 112);
         }
-        demoRequest = new DemoRequest(this);
+        final DemoRequest demoRequest = new DemoRequest(this);
         final TextView textView = (TextView) findViewById(R.id.textView);
         findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
             @Override
