@@ -25,7 +25,7 @@ import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.processors.PublishProcessor;
 import io.reactivex.schedulers.Schedulers;
-import network.tutoria.com.networkdemo.network.GsonUtil;
+import network.tutoria.com.networkdemo.network.util.GsonUtil;
 import network.tutoria.com.networkdemo.network.RequestBuilder;
 import network.tutoria.com.networkdemo.network.RequestError;
 import network.tutoria.com.networkdemo.network.api.NetworkRequestProcessor;

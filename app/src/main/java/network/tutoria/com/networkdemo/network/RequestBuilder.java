@@ -15,6 +15,7 @@ import network.tutoria.com.networkdemo.network.api.CustomParser;
 import network.tutoria.com.networkdemo.network.api.NetworkRequestProcessor;
 import network.tutoria.com.networkdemo.network.api.NetworkResultHandler;
 import network.tutoria.com.networkdemo.network.retrofit.NetworkRequestRetrofitProcessor;
+import network.tutoria.com.networkdemo.network.util.HeaderUtil;
 
 /**
  * 包含了所有的请求的数据信息
@@ -75,7 +76,7 @@ public class RequestBuilder {
         return new RequestBuilder(METHOD_UPLOAD_FILE).url(url).uploadFilePart(filePart);
     }
 
-    public static RequestBuilder download(@NonNull String url, File downloadTargetFile) {
+    public static RequestBuilder download(@NonNull String url,@NonNull File downloadTargetFile) {
         return new RequestBuilder(METHOD_DOWNLOAD_FILE).url(url).downloadFile(downloadTargetFile);
     }
 

@@ -1,4 +1,4 @@
-package network.tutoria.com.networkdemo.network;
+package network.tutoria.com.networkdemo.network.util;
 
 import com.google.gson.Gson;
 

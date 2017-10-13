@@ -1,5 +1,7 @@
 package network.tutoria.com.networkdemo.network.api;
 
+import java.io.File;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -20,7 +22,16 @@ import network.tutoria.com.networkdemo.network.retrofit.NetworkRequestRetrofitPr
 public abstract class RequestBase {
 
     /*
-      *取消并删除之前发起的相同url的请求
+            IRequestBaseManager
+         */
+    public RequestBase(IRequestBaseManager requestBaseManager) {
+        requestBaseManager.addRequestBase(this);
+    }
+
+    /*
+     *
+     *取消并删除之前发起的相同url的请求
+     *
      */
     public void cancelPreRequest(@android.support.annotation.NonNull final String url) {
         Flowable.fromIterable(requestBuilders).filter(new Predicate<RequestBuilder>() {
@@ -47,14 +58,26 @@ public abstract class RequestBase {
 
     private HashSet<RequestBuilder> requestBuilders = new HashSet<>();
 
-    protected void addRequestBuiler(RequestBuilder requestBuilder) {
+    /*
+     *将一个请求添加到管理类中
+     */
+    protected RequestBuilder addRequestBuilder(RequestBuilder requestBuilder) {
         requestBuilders.add(requestBuilder);
+        return requestBuilder;
     }
 
-    protected void removeRequestBuiler(RequestBuilder requestBuilder) {
+    protected void removeRequestBuilder(RequestBuilder requestBuilder) {
         requestBuilders.remove(requestBuilder);
     }
 
+    //是不是需要检查删除保存的请求对象 可以自己修改
+    public boolean isNeedCheckRequest() {
+        return requestBuilders.size() > 2;
+    }
+
+    /*
+    检查一下 删除已经完成的请求对象
+     */
     public void checkRequest() {
         if (!requestBuilders.isEmpty()) {
             Iterator<RequestBuilder> requestBuilderIterator = requestBuilders.iterator();
@@ -69,7 +92,7 @@ public abstract class RequestBase {
     }
 
 
-    public void cancleAllRequest() {
+    public void cancelAllRequest() {
         if (!requestBuilders.isEmpty()) {
             for (RequestBuilder request : requestBuilders) {
                 if (!request.isDone()) {
@@ -79,4 +102,33 @@ public abstract class RequestBase {
             requestBuilders.clear();
         }
     }
+
+    protected RequestBuilder requestGet(String url) {
+        if (isNeedCheckRequest()) {
+            checkRequest();
+        }
+        return addRequestBuilder(RequestBuilder.get(url));
+    }
+
+    protected RequestBuilder requestPost(String url) {
+        if (isNeedCheckRequest()) {
+            checkRequest();
+        }
+        return addRequestBuilder(RequestBuilder.post(url));
+    }
+
+    protected RequestBuilder requestDownload(String url, @NonNull File downloadTargetFile) {
+        if (isNeedCheckRequest()) {
+            checkRequest();
+        }
+        return addRequestBuilder(RequestBuilder.download(url, downloadTargetFile));
+    }
+
+    protected RequestBuilder requestUpload(String url, @NonNull HashMap<String, File> filePart) {
+        if (isNeedCheckRequest()) {
+            checkRequest();
+        }
+        return addRequestBuilder(RequestBuilder.upload(url, filePart));
+    }
+
 }

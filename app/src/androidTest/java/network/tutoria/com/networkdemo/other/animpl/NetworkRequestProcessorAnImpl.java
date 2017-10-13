@@ -16,7 +16,7 @@ import java.io.File;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 
-import network.tutoria.com.networkdemo.network.GsonUtil;
+import network.tutoria.com.networkdemo.network.util.GsonUtil;
 import network.tutoria.com.networkdemo.network.RequestBuilder;
 import network.tutoria.com.networkdemo.network.RequestError;
 import network.tutoria.com.networkdemo.network.api.NetworkRequestProcessor;

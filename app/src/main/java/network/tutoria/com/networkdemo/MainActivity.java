@@ -6,7 +6,6 @@ import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.PermissionChecker;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -15,11 +14,14 @@ import java.io.File;
 import java.util.HashMap;
 
 import network.tutoria.com.networkdemo.bean.LoginBean;
+import network.tutoria.com.networkdemo.base.BaseActivity;
 import network.tutoria.com.networkdemo.network.RequestBuilder;
 import network.tutoria.com.networkdemo.network.RequestError;
 import network.tutoria.com.networkdemo.network.api.NetworkResultHandler;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
+
+    DemoRequest demoRequest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,12 +30,12 @@ public class MainActivity extends AppCompatActivity {
         if (PermissionChecker.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PermissionChecker.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 112);
         }
+        demoRequest = new DemoRequest(this);
         final TextView textView = (TextView) findViewById(R.id.textView);
         findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DemoRequest demoRequest = new DemoRequest("xx", "xxx");
-                demoRequest.doRegister(new NetworkResultHandler<Object>() {
+                demoRequest.doRegister("email", "pwd", new NetworkResultHandler<Object>() {
                     @Override
                     public void onError(RequestError error) {
                         super.onError(error);
