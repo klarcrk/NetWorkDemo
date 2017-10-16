@@ -27,24 +27,24 @@ import retrofit2.http.Url;
 public interface RetrofitRequestService {
 
     @GET()
-    Observable<ResponseBody> get(@HeaderMap Map<String, String> headers, @Url String url, @QueryMap Map<String, String> queryParams);
+    Observable<retrofit2.Response<ResponseBody>> get(@HeaderMap Map<String, String> headers, @Url String url, @QueryMap Map<String, String> queryParams);
 
     @FormUrlEncoded
     @POST
-    Observable<ResponseBody> post(@HeaderMap Map<String, String> headers, @Url String url, @FieldMap Map<String, String> queryParams);
+    Observable<retrofit2.Response<ResponseBody>> post(@HeaderMap Map<String, String> headers, @Url String url, @FieldMap Map<String, String> queryParams);
 
 
     @FormUrlEncoded
     @POST
-    Observable<ResponseBody> postWithObject(@HeaderMap Map<String, String> headers, @Url String url, @FieldMap Map<String, Object> requestPart);
+    Observable<retrofit2.Response<ResponseBody>> postWithObject(@HeaderMap Map<String, String> headers, @Url String url, @FieldMap Map<String, Object> requestPart);
 
 
     @Streaming
     @GET
-    Observable<ResponseBody> downloadFile(@HeaderMap Map<String, String> headers, @Url String url, @QueryMap Map<String, String> queryParams);
+    Observable<retrofit2.Response<ResponseBody>> downloadFile(@HeaderMap Map<String, String> headers, @Url String url, @QueryMap Map<String, String> queryParams);
 
     @Multipart
     @POST
-    Observable<ResponseBody> uploadFile(@HeaderMap Map<String, String> headers, @Url String url, @Part List<MultipartBody.Part> parts);
+    Observable<retrofit2.Response<ResponseBody>> uploadFile(@HeaderMap Map<String, String> headers, @Url String url, @Part List<MultipartBody.Part> parts);
 
 }

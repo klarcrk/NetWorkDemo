@@ -1,4 +1,4 @@
-package network.tutoria.com.networkdemo.network.retrofit;
+package network.tutoria.com.networkdemo.network.manager;
 
 import android.support.annotation.NonNull;
 

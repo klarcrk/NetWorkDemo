@@ -29,19 +29,22 @@ public abstract class RequestBase {
     private final String fragmentTagForRequest = "fragmentTagForRequest";
 
     /*
-    *
+    *todo 用lifecycle框架替换
     */
     public RequestBase(FragmentActivity requestBaseManager) {
+        //监听onDestroy事件
         android.support.v4.app.FragmentManager supportFragmentManager = requestBaseManager.getSupportFragmentManager();
         initFragmentV4(supportFragmentManager);
     }
 
     public RequestBase(Fragment fragment) {
+        //监听onDestroy事件
         FragmentManager childFragmentManager = fragment.getChildFragmentManager();
         initFragment(childFragmentManager);
     }
 
     public RequestBase(android.support.v4.app.Fragment fragment) {
+        //监听onDestroy事件
         android.support.v4.app.FragmentManager childFragmentManager = fragment.getChildFragmentManager();
         initFragmentV4(childFragmentManager);
     }
@@ -78,8 +81,6 @@ public abstract class RequestBase {
     private RequestManagerFragment findFragment(FragmentManager childFragmentManager) {
         return (RequestManagerFragment) childFragmentManager.findFragmentByTag(fragmentTagForRequest);
     }
-
-
 
 
     /*

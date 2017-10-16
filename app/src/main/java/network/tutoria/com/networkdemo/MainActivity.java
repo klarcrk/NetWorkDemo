@@ -15,7 +15,6 @@ import android.widget.Toast;
 import java.io.File;
 import java.util.HashMap;
 
-import network.tutoria.com.networkdemo.bean.LoginBean;
 import network.tutoria.com.networkdemo.network.RequestBuilder;
 import network.tutoria.com.networkdemo.network.RequestError;
 import network.tutoria.com.networkdemo.network.api.NetworkResultHandler;
@@ -34,32 +33,19 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                demoRequest.doRegister("email", "pwd", new NetworkResultHandler<Object>() {
-                    @Override
-                    public void onError(RequestError error) {
-                        super.onError(error);
-                        textView.setText(error.getError().getMessage());
-                    }
+                RequestBuilder.get("http://gank.io/api/data/休息视频/1/1")
+                        .doRequest(String.class, new NetworkResultHandler<String>() {
+                            @Override
+                            public void onError(RequestError error) {
+                                super.onError(error);
+                            }
 
-                    @Override
-                    public void onLoadSuccess(Object result) {
-                        super.onLoadSuccess(result);
-                        textView.setText(result.toString());
-                    }
-                });
-
-                HashMap<String, String> params = new HashMap<String, String>();
-                demoRequest.doLogin(params, new NetworkResultHandler<LoginBean>() {
-                    @Override
-                    public void onLoadSuccess(LoginBean result) {
-                        super.onLoadSuccess(result);
-                    }
-
-                    @Override
-                    public void onError(RequestError error) {
-                        super.onError(error);
-                    }
-                });
+                            @Override
+                            public void onLoadSuccess(String result) {
+                                super.onLoadSuccess(result);
+                                textView.setText(result);
+                            }
+                        });
 
             }
         });

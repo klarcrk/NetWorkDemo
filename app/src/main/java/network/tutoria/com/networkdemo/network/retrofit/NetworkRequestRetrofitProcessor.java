@@ -21,12 +21,14 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.processors.PublishProcessor;
 import io.reactivex.schedulers.Schedulers;
-import network.tutoria.com.networkdemo.network.util.GsonUtil;
 import network.tutoria.com.networkdemo.network.RequestBuilder;
 import network.tutoria.com.networkdemo.network.RequestError;
 import network.tutoria.com.networkdemo.network.api.CustomParser;
 import network.tutoria.com.networkdemo.network.api.NetworkRequestProcessor;
 import network.tutoria.com.networkdemo.network.api.NetworkResultHandler;
+import network.tutoria.com.networkdemo.network.manager.RequestManager;
+import network.tutoria.com.networkdemo.network.util.GsonUtil;
+import okhttp3.Headers;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -98,6 +100,9 @@ public class NetworkRequestRetrofitProcessor implements NetworkRequestProcessor 
         if (requestContents.isParsableFlag()) {
             String resultData = responseBody.string();
             try {
+                if (type == String.class) {
+                    return (T) resultData;
+                }
                 return parseStringToObject(requestContents, resultData, type);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -110,11 +115,14 @@ public class NetworkRequestRetrofitProcessor implements NetworkRequestProcessor 
     }
 
     public <T> void startGetRequest(final RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler, final Type type) {
-        Observable<ResponseBody> responseBodyObservable = requestService.get(requestContents.getHeaders(), requestContents.getUrl(), requestContents.getRequestParams());
-        Disposable disposable = responseBodyObservable.map(new Function<ResponseBody, T>() {
+        Observable<retrofit2.Response<ResponseBody>> responseBodyObservable = requestService.get(requestContents.getHeaders(), requestContents.getUrl(), requestContents.getRequestParams());
+        Disposable disposable = responseBodyObservable.map(new Function<retrofit2.Response<ResponseBody>, T>() {
             @Override
-            public T apply(@NonNull ResponseBody responseBody) throws Exception {
-                return parseResponseBody(responseBody, requestContents, type);
+            public T apply(@NonNull retrofit2.Response<ResponseBody> response) throws Exception {
+                ResponseBody body = response.body();
+                //// TODO: 2017/10/16  header
+                Headers headers = response.headers();
+                return parseResponseBody(body, requestContents, type);
             }
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<T>() {
@@ -140,9 +148,12 @@ public class NetworkRequestRetrofitProcessor implements NetworkRequestProcessor 
 
     @Override
     public <T> void startPostRequest(final RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler, final Type type) {
-        Observable<T> request = requestService.post(requestContents.getHeaders(), requestContents.getUrl(), requestContents.getRequestParams()).map(new Function<ResponseBody, T>() {
+        Observable<T> request = requestService.post(requestContents.getHeaders(), requestContents.getUrl(), requestContents.getRequestParams()).map(new Function<retrofit2.Response<ResponseBody>, T>() {
             @Override
-            public T apply(@NonNull ResponseBody responseBody) throws Exception {
+            public T apply(@NonNull retrofit2.Response<ResponseBody> response) throws Exception {
+                //// TODO: 2017/10/16  header
+                Headers headers = response.headers();
+                ResponseBody responseBody = response.body();
                 return parseResponseBody(responseBody, requestContents, type);
             }
         });
@@ -187,9 +198,12 @@ public class NetworkRequestRetrofitProcessor implements NetworkRequestProcessor 
             multiPartBuilder.addFormDataPart(fileParamKey, file.getName(), fileUploadBody);
             uploadPostBodies.add(fileUploadBody);
         }
-        Observable<T> uploadRequest = requestService.uploadFile(requestContents.getHeaders(), requestContents.getUrl(), multiPartBuilder.build().parts()).map(new Function<ResponseBody, T>() {
+        Observable<T> uploadRequest = requestService.uploadFile(requestContents.getHeaders(), requestContents.getUrl(), multiPartBuilder.build().parts()).map(new Function<retrofit2.Response<ResponseBody>, T>() {
             @Override
-            public T apply(@NonNull ResponseBody responseBody) throws Exception {
+            public T apply(@NonNull retrofit2.Response<ResponseBody> response) throws Exception {
+                //// TODO: 2017/10/16  header
+                Headers headers = response.headers();
+                ResponseBody responseBody = response.body();
                 return parseResponseBody(responseBody, requestContents, type);
             }
         });
@@ -251,11 +265,14 @@ public class NetworkRequestRetrofitProcessor implements NetworkRequestProcessor 
     @Override
     public <T> void startDownloadRequest(final RequestBuilder requestContents, final NetworkResultHandler<T> resultHandler) {
         final File downloadTargetFile = requestContents.getDownloadTargetFile();
-        Observable<ResponseBody> responseBodyObservable = requestService.downloadFile(requestContents.getHeaders(), requestContents.getUrl(), requestContents.getRequestParams());
+        Observable<retrofit2.Response<ResponseBody>> responseBodyObservable = requestService.downloadFile(requestContents.getHeaders(), requestContents.getUrl(), requestContents.getRequestParams());
         final PublishProcessor<Integer> publishProcessor = PublishProcessor.create();
-        Disposable disposable = responseBodyObservable.subscribeOn(Schedulers.io()).map(new Function<ResponseBody, File>() {
+        Disposable disposable = responseBodyObservable.subscribeOn(Schedulers.io()).map(new Function<retrofit2.Response<ResponseBody>, File>() {
             @Override
-            public File apply(@NonNull ResponseBody responseBody) throws Exception {
+            public File apply(@NonNull retrofit2.Response<ResponseBody> response) throws Exception {
+                //// TODO: 2017/10/16  header
+                Headers headers = response.headers();
+                ResponseBody responseBody = response.body();
                 InputStream inputStream = responseBody.byteStream();
                 Source source = Okio.source(inputStream);
                 Sink fileSink = Okio.sink(downloadTargetFile);
